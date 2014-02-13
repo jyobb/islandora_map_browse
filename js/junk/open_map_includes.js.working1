@@ -1,0 +1,136 @@
+Drupal.behaviors.islandora_map_browse = {
+    attach: function (context) {
+    var map;    
+    initialize();
+    }
+};
+
+
+
+function initialize() {
+
+    //Here is where the variables are passed to the javascript
+    //var centre = '52.1311, -106.6353';
+    centre = Drupal.settings.islandora_map_browse_settings.centre;
+    var centreLocation = getPosition(centre);
+    var pins = Drupal.settings.islandora_map_browse_settings_pins;
+    var nopins = Drupal.settings.islandora_map_browse_settings_nopins;
+    var jsInfo = Drupal.settings.islandora_map_browse_settings_jsInfo;
+    var raw = Drupal.settings.islandora_map_browse_settings_raw;
+    var result = '';
+
+    //prepare the data
+    var confObj = JSON.parse(jsInfo);
+    var searchTerm = confObj.qt;
+    var numFound = confObj.numFound;
+    var rows = confObj.rows;
+    var baseUrl = confObj.baseUrl;
+    var fedoraPrefix = confObj.fedoraPrefix;
+    var fedoraSuffix = confObj.fedoraSuffix;
+    var objectPrefix = confObj.objectPrefix;
+    var withLocationCnt = confObj.pinsCount;
+    var withNoLocationCnt = confObj.nopinsCount;
+    //Other vars
+    var pinsObject = JSON.parse(pins);
+    var markers = [];
+    var noPinsObj = JSON.parse(nopins);
+    var locationResults = 0;
+    var sideBar = document.getElementById('text_canvas');
+    var topBar = document.getElementById('info_canvas');
+    var matched = new Boolean();
+
+
+
+    var dumpObject = JSON.stringify(pins);
+    console.log(dumpObject);
+    var options = {
+	controls: [
+		   new OpenLayers.Control.Navigation(),
+		   new OpenLayers.Control.PanZoomBar(),
+		   new OpenLayers.Control.Attribution()
+          ]
+    };
+
+    map = new OpenLayers.Map("map_canvas", options);
+    var mapLayer         = new OpenLayers.Layer.OSM();
+    var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+    var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+    var position       = new OpenLayers.LonLat(-106.6353, 52.1311).transform( fromProjection, toProjection);
+    var zoom           = 8; 
+ 
+    map.addLayer(mapLayer);
+    map.setCenter(position, zoom );
+
+    function onPopupClose(evt) { while (map.popups.length > 0) {
+	    map.removePopup(map.popups[0]);
+	}  }
+
+    //var pointStyle = new OpenLayers.Style({pointRadius: 10, fill.Color:"red"});
+
+    var style = OpenLayers.Util.extend({
+	    fillColor: "#ff0000",
+	    fillOpacity: 0.5,
+	    pointRadius: 50,
+	}, OpenLayers.Feature.Vector.style['default']);
+
+
+    //var markers = new OpenLayers.Layer.Markers( "Markers" );
+    var markersOverlay = new OpenLayers.Layer.Vector("Overlay");
+    var myLatlng = new OpenLayers.Geometry.Point(-106.6353, 52.1311).transform( fromProjection, toProjection);
+    //console.log(myLatlng.toShortString());
+    var f = new OpenLayers.Feature.Vector(myLatlng,null,style);
+    markersOverlay.addFeatures([f]);
+
+
+    for( var latLong in pinsObject){
+	var p = getPosition(latLong);
+	//console.log(p.toShortString());
+	var feat = new OpenLayers.Feature.Vector(p,null,style);
+	//for( var pid in myObject[latLong] ){
+	//    var title = myObject[latLong][pid].title;
+	//    var contrib = myObject[latLong][pid].contrib;
+	//    var loc = myObject[latLong][pid].loc;
+	//    var desc = myObject[latLong][pid].desc;
+	//}
+	//marker = new OpenLayers.Marker(position);
+	//marker.events.register("click", marker, function(){
+	//	map.addPopup(new OpenLayers.Popup("featurePopup", position, new OpenLayers.Size(100, 100), "<h2>Title</h2>description", true, onPopupClose));
+	//});
+	markersOverlay.addFeatures([feat]);
+       }
+    map.addLayer(markersOverlay);
+    // map.addLayer(markers);
+    //This is a working blob of code that adds markers
+    //marker = new OpenLayers.Marker(position);
+       // marker.events.register("click", marker, function(){
+       //	    map.addPopup(new OpenLayers.Popup("featurePopup", position, new OpenLayers.Size(100, 100), "<h2>Title</h2>description", true, onPopupClose));
+       //	});
+       //markers.addMarker(marker);
+ 
+
+    function getPosition(loc){
+	console.log(loc);
+        var commaPos = loc.indexOf(',');
+        var coordinatesLat = parseFloat(loc.substring(0, commaPos));
+        var coordinatesLong = parseFloat(loc.substring(commaPos + 1, loc.length));
+        //var myLatlng = new google.maps.LatLng(coordinatesLat, coordinatesLong);
+	//Used for marker layer
+	//var myLatlng       = new OpenLayers.LonLat(coordinatesLong, coordinatesLat).transform( fromProjection, toProjection);
+	//Used for vector layer
+	var myLatlng = new OpenLayers.Geometry.Point(coordinatesLong, coordinatesLat).transform( fromProjection, toProjection);
+        return myLatlng;
+    }
+
+
+
+    
+
+
+    //Information about the search and system
+
+    //Helper functions below here
+
+
+
+}
+

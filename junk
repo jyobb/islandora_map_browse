@@ -1,0 +1,103 @@
+
+/** this function is not finished yet **/
+
+function browse_collection_kml(){
+
+global $_islandora_solr_queryclass;
+$output = '';
+//mods_coordinates_ms:[* TO *]
+//Create the query
+$query = "mods_coordinates_ms:[* TO *]";
+$params = array('q' => 'islandora/search/mods_coordinates_ms:[* TO *]', 'qt' => 'mapbrowse');
+
+//Run the query
+$_islandora_solr_queryclass = new IslandoraSolrQueryProcessor();
+$_islandora_solr_queryclass->buildQuery($query, $params);
+$_islandora_solr_queryclass->solrLimit = 2000;
+$_islandora_solr_queryclass->executeQuery();
+
+$response_data = $_islandora_solr_queryclass->islandoraSolrResult['response'];
+//$all = $_islandora_solr_queryclass;
+//drupal_set_message(var_dump($all));
+
+if (empty($_islandora_solr_queryclass->islandoraSolrResult)) {
+   $output =  t('Error searching solr index.');
+}
+
+//Below here can be factored out i think
+drupal_add_js(drupal_get_path('module', 'islandora_map_browse') . '/js/open_map_includes.js', 'file');
+drupal_add_js(drupal_get_path('module', 'islandora_map_browse') . '/js/OpenLayers-2.12/OpenLayers.js', 'file');
+
+
+$InfoForJS['qt'] = $_islandora_solr_queryclass->solrQuery;
+$InfoForJS['numFound'] = $_islandora_solr_queryclass->islandoraSolrResult['response']['numFound'];
+$InfoForJS['rows'] = $_islandora_solr_queryclass->solrLimit;
+//Need to query drupal for the fedora URL 
+$InfoForJS['baseUrl'] = "http://islandorasev-dev.usask.ca";
+$InfoForJS['fedoraPrefix'] = "/islandora/object/";
+$InfoForJS['fedoraSuffix'] = "/datastream/TN/view";
+$InfoForJS['objectPrefix'] = "/islandora/object/";
+
+
+$object_results = $response_data['objects'];
+$newpins = array();
+$nopins = array();
+$withVal = '';
+$withoutVal = '';
+foreach ($response_data['objects'] as $object_result) {
+	$doc = $object_result['solr_doc'];
+	$thumb = $object_result['thumbnail_url'];
+	$obj = $object_result['object_url'];
+	$coordinatesLatLon = null;	
+	//Need to put a check in here to avoid the undefined index error
+      	if( isset($doc['mods_coordinates_p']) && $doc['mods_coordinates_p'] != '' && isset($doc['dc.title']) && isset($doc['dc.contributor'])){
+              $withVal++;
+	      if(array_key_exists($doc['mods_coordinates_p'], $newpins)){
+			$tmpArr = $newpins[$doc['mods_coordinates_p']]; 
+			$tmpArr[$doc['PID']] = array ("title" => $doc["dc.title"], "contrib" => $doc["dc.contributor"], "loc" => $doc["mods_physicalLocation_ms"],"desc" => $doc["dc.description"],"obj_url" => $obj,"thumb_url" => $thumb);
+			$newpins[$doc['mods_coordinates_p']] = $tmpArr;
+		} else {
+		       if( isset($doc["mods_physicalLocation_ms"] )){
+			$newpins[$doc['mods_coordinates_p']] = array( $doc['PID'] => array ("title" => $doc["dc.title"], "contrib" => $doc["dc.contributor"], "loc" => $doc["mods_physicalLocation_ms"],"desc" => $doc["dc.description"],"obj_url" => $obj,"thumb_url" => $thumb));
+			}else{
+			$newpins[$doc['mods_coordinates_p']] = array( $doc['PID'] => array ("title" => $doc["dc.title"], "contrib" => $doc["dc.contributor"] ,"desc" => $doc["dc.description"],"obj_url" => $obj,"thumb_url" => $thumb));
+			}
+			}
+	  }else{
+			$nopins[$doc['PID']] = array ("obj_url" => $obj,"thumb_url" => $thumb);
+			if(isset($doc["dc.title"])){
+				$nopins[$doc['PID']]["title"] = $doc["dc.title"]; 
+			}			
+			if(isset($doc["dc.contributor"])){
+				$nopins[$doc['PID']]["contrib"] = $doc["dc.contributor"]; 
+			}			
+			if(isset($doc["dc.description"])){
+				$nopins[$doc['PID']]["desc"] = $doc["dc.description"]; 
+			}			
+	  $withoutVal++; 
+       	  }
+}
+
+$InfoForJS['pinsCount'] = $withVal;
+$InfoForJS['nopinsCount'] = $withoutVal;
+
+
+//drupal_set_message(print_r($newpins));
+//Encode everything that goes to JS
+$jsInfo = json_encode($InfoForJS);
+$jnopins = json_encode($nopins);
+$jpins = json_encode($newpins);
+//drupal_set_message(print_r($nopins));
+//drupal_set_message(print_r($jnopins));
+
+
+drupal_add_js(array('islandora_map_browse_settings' => array('centre' => '52.1311, -106.6353')), 'setting');
+drupal_add_js(array('islandora_map_browse_settings_pins' => $jpins), 'setting');
+drupal_add_js(array('islandora_map_browse_settings_nopins' => $jnopins), 'setting');
+drupal_add_js(array('islandora_map_browse_settings_jsInfo' => $jsInfo), 'setting');
+//drupal_add_js(array('islandora_map_browse_settings_raw' => $res), 'setting');
+    
+    $output = '<div id="info_canvas" style="width:600px; height:60px;"></div><div id="map_canvas" style="width:600px; height:600px; float: left;"></div><div id="text_canvas" style="width:200px; height:600px; float: right; overflow: auto;"></div>';
+
+return $output;
+}
