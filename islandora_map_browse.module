@@ -1,0 +1,76 @@
+<?php
+
+
+function islandora_map_browse_init(){
+    drupal_add_css(drupal_get_path('module', 'islandora_map_browse') .'/css/popup.css');
+}
+
+/*need to use hook_menu to build config menu https://drupal.org/node/1111212 see link to form code on page
+ * config items: center:52.1311, -106.6353
+ * 	  	 max rows: 2000
+ * 	  	 baseUrl : http://islandorasev-dev.usask.ca
+ *		 fedoraPrefix :  /islandora/object/
+ *		 fedoraSuffix : /datastream/TN/view
+ *		 objectPrefix : /islandora/object/
+ *		 get pagination count from solr module setting
+ */
+
+
+
+function islandora_map_browse_menu(){
+
+	$items['admin/islandora/mapbrowse'] = array(
+    'title' => 'Islandora Map Views',
+    'description' => 'View collection map',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('map_browse_config'),
+    'file' => 'includes/admin.form.inc',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+    );
+
+
+	 return $items;
+}
+
+
+/**
+ * Implements hook_islandora_solr_secondary_display()
+ */
+function islandora_map_browse_islandora_solr_secondary_display() {
+  // set path
+  global $base_path;
+  $path = $base_path . drupal_get_path('module', 'islandora_map_browse');
+  return array(
+    'MapView' => array(
+      'name' => t('View All Results on Map'),
+      'module' => 'islandora_map_browse',
+      'file' => 'includes/IslandoraSolrResultsMapView.inc',
+      'class' => 'IslandoraSolrResultsMapView',
+      'function' => 'mapResults',
+      'description' => 'Display Results on a Map',
+      'logo' => '<img src="' . $path . '/images/map-icon-96.png" class="islandora_solr_secondary_display_icon">',
+    ),
+    'MapPageView' => array(
+      'name' => t('Paged Map View'),
+      'module' => 'islandora_map_browse',
+      'file' => 'includes/IslandoraSolrResultsMapView.inc',
+      'class' => 'IslandoraSolrResultsMapView',
+      'function' => 'mapPageResults',
+      'description' => 'Display Single Page Results on a Map',
+      'logo' => '<img src="' . $path . '/images/map-icon-72.png" class="islandora_solr_secondary_display_icon">',
+    ),
+    'MapGEOJSONView' => array(
+      'name' => t('Map Testing View'),
+      'module' => 'islandora_map_browse',
+      'file' => 'includes/IslandoraSolrResultsMapView.inc',
+      'class' => 'IslandoraSolrResultsMapView',
+      'function' => 'mapGEOJSONResults',
+      'description' => 'Display Single Page Results on a Map',
+      'logo' => '<img src="' . $path . '/images/google-map-logo.gif" class="islandora_solr_secondary_display_icon">',
+    ),
+
+  );
+}
+
+
