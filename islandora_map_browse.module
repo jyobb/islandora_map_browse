@@ -69,6 +69,16 @@ function islandora_map_browse_islandora_solr_secondary_display() {
       'description' => 'Display Single Page Results on a Map',
       'logo' => '<img src="' . $path . '/images/google-map-logo.gif" class="islandora_solr_secondary_display_icon">',
     ),
+    'MapGEOJSONAll' => array(
+      'name' => t('All Geojson'),
+      'module' => 'islandora_map_browse',
+      'file' => 'includes/IslandoraSolrResultsMapView.inc',
+      'class' => 'IslandoraSolrResultsMapView',
+      'function' => 'mapGEOJSONAll',
+      'description' => 'Display Single Page Results on a Map',
+      'logo' => '<img src="' . $path . '/images/google-map-logo.gif" class="islandora_solr_secondary_display_icon">',
+    ),
+
 
   );
 }

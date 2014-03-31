@@ -151,6 +151,50 @@ return $out;
 }//End of mapPageResults
 
 
+function mapGEOJSONAll($solrQueryProcessor) {
+
+	 $page = 0;
+	 $url_args = array();
+	 $url_args = parse_str(parse_url($_SERVER['HTTP_REFERER'], PHP_URL_QUERY));
+	 $increment = 5000;
+	 $lowerlimit = ((($page + 1)*$increment)-$increment);
+
+	 //Set up the variables that get passed to javascript
+	 $this->prepareGEOJSONVariablesConfig($solrQueryProcessor);
+
+	 //$queryInfoForJS = array();
+	 $response_data = $solrQueryProcessor->islandoraSolrResult['response'];
+
+	 //Dump the following into drupal set message to see what your dealing with var_dump to debug
+	 $res = $solrQueryProcessor;
+
+	 //The fields added here are required
+	 $fl_params = "PID, RELS_EXT_hasModel_uri_ms, " . variable_get('map_browse_return_fields') . ", ". variable_get('map_browse_title_field') . ", ". variable_get('map_browse_coord_field');	 
+	 //RELS_EXT_hasModel_uri_ms, mods_location_url_ms,
+
+	 //var_dump($fl_params);
+	 $solrQueryProcessor->solrParams['fl'] = array($fl_params);
+	 
+	 	 
+	 //This section resets the limits on the query and re-executes
+	 $upperlimit = $solrQueryProcessor->islandoraSolrResult['response']['numFound'];
+
+	 $solrQueryProcessor->solrStart = $lowerlimit;
+	 $solrQueryProcessor->solrLimit = $increment;
+
+	 $solrQueryProcessor->resetResults();
+	 $solrQueryProcessor->executeQuery(FALSE);
+	 $response_data = $solrQueryProcessor->islandoraSolrResult['response'];
+//var_dump($response_data);
+	 $out = $this->prepareSolrResultsGEOJSONConfig($response_data);
+
+return $out;
+
+}//End of mapPageResults
+
+
+
+
 /**
  * @param $solrQueryProcessor
  * A solr query object
@@ -318,21 +362,31 @@ foreach ($response_data['objects'] as $object_result) {
 	if( isset($doc[$mods_location]) && $doc[$mods_location] != ''){
               $withVal++;
 	      $parts = explode(",",$doc[$mods_location][0]);
-	      $lat = floatval($parts[0]);
-	      $lon = floatval($parts[1]);
-	      $props = array("title" => $doc['dc.title'], "obj_url" => $obj, "thumb_url" => $thumb);      	      
-		      
-	      $displayFields = explode(",", variable_get('map_browse_return_fields'));
-	      $tdisplayFields = array();
-	      foreach($displayFields as $k => $v){
-	      			     $tv = trim($v);
-				     $tdisplayFields[$tv] = $tv;
-				     if(array_key_exists($tv, $doc)){
-				     $props[$tv] = $doc[$tv];
-				     }
-				    }
-	      $newgeo["features"][] = array("type" => "Feature", "geometry" => array("type" => "Point", "coordinates" => array($lon,$lat)), "properties" => $props);
+	      //Check to see if the location is in the correct format.  If not report to error log
+	      if ( !isset($parts[1]) || !isset($parts[1])) {
+	      	 //var_dump($doc['PID']);
+		 //http://sho-islandora-live.usask.ca/islandora/object/islandora%3A32650
+		 //variable_get('map_browse_fedora_prefix');
+		 //variable_get('map_browse_fedora_base');
+		 watchdog("mods_location bad format", "See: " .$doc['PID']);
+	      }else{
+ 
+		$lat = floatval($parts[0]);
+	      	$lon = floatval($parts[1]);
 
+	      	$props = array("title" => $doc['dc.title'], "obj_url" => $obj, "thumb_url" => $thumb);      	      
+		      
+	        $displayFields = explode(",", variable_get('map_browse_return_fields'));
+	        $tdisplayFields = array();
+	        foreach($displayFields as $k => $v){
+	      	  $tv = trim($v);
+		  $tdisplayFields[$tv] = $tv;
+		  if(array_key_exists($tv, $doc)){
+		     $props[$tv] = $doc[$tv];
+		  }
+		}
+	      $newgeo["features"][] = array("type" => "Feature", "geometry" => array("type" => "Point", "coordinates" => array($lon,$lat)), "properties" => $props);
+	      }
 	}else{
 		if(strcmp($doc["RELS_EXT_hasModel_uri_ms"]['0'], "info:fedora/islandora:collectionCModel") != 0 ){
 			$nopins[$doc['PID']] = array ("obj_url" => $obj,"thumb_url" => $thumb);
