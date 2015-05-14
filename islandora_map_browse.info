@@ -2,6 +2,8 @@ name = Islandora Map Browser
 description = "Module that allows browsing of the collection via map"
 core = 7.x
 package = USask
+dependencies[] = ctools
+dependencies[] = colorbox
 
 ;NEW LINE
 configure = admin/islandora/mapbrowse
