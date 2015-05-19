@@ -5,12 +5,9 @@ Map browser for islandora
 
 __Requirements__
 
-islandora_solr_search
-drupal libraries module
-drupal colorbox module
-drupal chaos tools module
+The following modules are required islandora_solr_search, drupal libraries module, drupal colorbox module, drupal chaos tools module
 
-leaflet and Leaflet.markercluster-master needs to be in the libraries directory
+leaflet and Leaflet.markercluster-master need to be in the libraries directory
 
 To enable islandora map browse you will need to configure gsearch to index mods so a lat lon location fields is available
 
