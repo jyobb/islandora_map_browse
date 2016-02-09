@@ -22,8 +22,8 @@ To enable Islandora Map Browse you will need to configure gsearch to index mods 
 
 There are several configuration settings you should review and the module configuration is available on this drupal path - admin/islandora/mapbrowse.
 
-* Fedora Base URL - uum, the base url? 
-* Fedora base prefix - everything before the PID
+* Islandora Base URL - uum, the base url? 
+* Islandora base prefix - everything before the PID
 * Fedora base thumbnail suffix - everything after the PID for the thumbnail view
 * Solr coordinate field - the solr field containing the lat, long
 * Solr Title field - the solr field containing the title
