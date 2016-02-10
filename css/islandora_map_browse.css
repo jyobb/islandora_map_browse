@@ -1,8 +1,29 @@
 body {
-background-color: #AEACA9;
+//background-color: #AEACA9;
 background-size: 100%;
 font-family: Open Sans,Arial,Century gothic, sans-serif;
 color: #414042;
 font-size: 14px;
 font-weight: 400;
+}
+
+#skip-link {
+    display:none;
+}
+
+//#cboxWrapper {
+// background: #000;
+//} 
+
+#info_canvas {
+ //background: #EEEEEE;
+}
+
+//.region-content {
+//background: #000;
+//}
+
+#toolbar {
+//display:none;
+
 }
