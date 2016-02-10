@@ -51,100 +51,39 @@ function islandora_map_browse_preprocess_page(&$variables, $hook) {
   if(array_key_exists('solr_profile',$qparam)){
     if (strcasecmp($qparam['solr_profile'], 'MapGEOJSONView') == 0 || strcasecmp($qparam['solr_profile'], 'MapGEOJSONViewAll') == 0) {
       $variables['theme_hook_suggestions'][] = 'islandora_map_browse';
-     //var_dump($variables);
     }
   }
 }
-
 
 /**
  * @param css array included in the page
  * 
  * Remove some of the css so that the colorbox works correctly
- * some themes have css that messes up the page
+ * some themes have css that messes up the page so only include
+ * required styles
  */
 
 function islandora_map_browse_css_alter(&$css){
   $qparam = drupal_get_query_parameters();
   if (array_key_exists('solr_profile',$qparam)) {
     if (strcasecmp($qparam['solr_profile'], 'MapGEOJSONView') == 0 || strcasecmp($qparam['solr_profile'], 'MapGEOJSONViewAll') == 0) {
-      //These are not included, they are needed for the map
-      /*
-      'sites/all/modules/colorbox/styles/default/colorbox_style.css' => FALSE,
-      'sites/all/modules/islandora_map_browse/css/popup.css' => FALSE,
-      'misc/ui/jquery.ui.core.css' => FALSE,
-      'misc/ui/jquery.ui.theme.css' => FALSE,
-      'modules/shortcut/shortcut.css' => FALSE,
-      'modules/toolbar/toolbar.css' => FALSE,
-      sites/all/modules/colorbox/styles/default/colorbox_style.css
-      sites/all/modules/islandora_map_browse/css/popup.css
-      sites/all/modules/lightbox2/css/lightbox.css
-      misc/ui/jquery.ui.core.css
-      misc/ui/jquery.ui.theme.css
-      sites/all/modules/admin_menu/admin_menu.css
-      sites/all/modules/admin_menu/admin_menu.uid1.css
-      sites/all/modules/admin_menu/admin_menu_toolbar/admin_menu_toolbar.css
-      modules/shortcut/shortcut.css
-      'sites/sho.usask.ca/themes/sho_responsive/color/colors.css' => FALSE,
-      'sites/sho.usask.ca/themes/sho_responsive/style.css' => FALSE,
-      */
-      $exclude = array(
-        'sites/sho.usask.ca/themes/sho_responsive/css/responsive-style.css' => FALSE,
-        'sites/sho.usask.ca/themes/sho_responsive/css/layout.css' => FALSE,
-        'sites/sho.usask.ca/themes/sho_responsive/flexslider.css' => FALSE,
-        'sites/saskhistoryonline.ca/themes/sho_responsive/css/responsive-style.css' => FALSE,
-        'sites/saskhistoryonline.ca/themes/sho_responsive/css/layout.css' => FALSE,
-        'sites/saskhistoryonline..ca/themes/sho_responsive/flexslider.css' => FALSE,
-        'themes/garland/style.css' => FALSE,
-        'themes/garland/print.css' => FALSE,
-        'sites/all/modules/ctools/css/ctools.css' => FALSE,
-        'modules/overlay/overlay-parent.css' => FALSE,
-        'modules/system/system.base.css' => FALSE,
-        'modules/system/system.menus.css' => FALSE,
-        'modules/system/system.messages.css' => FALSE,
-        'modules/system/system.theme.css' => FALSE,
-        'modules/comment/comment.css' => FALSE,
-        'modules/field/theme/field.css' => FALSE,
-        'sites/all/modules/islandora/css/islandora.base.css' => FALSE,
-        'sites/all/modules/islandora/css/islandora.theme.css' => FALSE,
-        'sites/all/modules/islandora_solution_pack_audio/css/islandora_audio.theme.css' => FALSE,
-        'sites/all/modules/islandora_solution_pack_collection/css/islandora_basic_collection.base.css' => FALSE,
-        'sites/all/modules/islandora_solution_pack_collection/css/islandora_basic_collection.theme.css' => FALSE,
-        'sites/all/modules/islandora_solution_pack_image/css/islandora_basic_image.theme.css' => FALSE,
-        'sites/all/modules/islandora_batch/css/views_table_contextual_links_fix.css' => FALSE,
-        'sites/all/modules/islandora_bookmark/css/islandora_bookmark.css' => FALSE,
-        'sites/all/modules/islandora_solution_pack_large_image/css/islandora_large_image.theme.css' => FALSE,
-        'sites/all/modules/islandora_solution_pack_newspaper/css/islandora_newspaper.base.css' => FALSE,
-        'sites/all/modules/islandora_solution_pack_newspaper/css/islandora_newspaper.theme.css' => FALSE,
-        'sites/all/modules/islandora_solution_pack_pdf/css/islandora_pdf.theme.css' => FALSE,
-        'sites/all/modules/islandora_solr_search/css/islandora_solr.base.css' => FALSE,
-        'sites/all/modules/islandora_solr_metadata/css/islandora_solr_metadata.css' => FALSE,
-        'sites/all/modules/islandora_solution_pack_video/css/islandora_video.theme.css' => FALSE,
-        'modules/node/node.css' => FALSE,
-        'modules/search/search.css' => FALSE,
-        'modules/user/user.css' => FALSE,
-        'sites/all/modules/views/css/views.css' => FALSE,
-        'sites/all/modules/islandora_solr_search/css/islandora_solr.theme.css' => FALSE,
-        'themes/garland/fix-ie.css' => FALSE,
-      );
-      $css = array_diff_key($css, $exclude);
 
-      /*	
-      foreach($css as $k => $v){
-        echo $k ."<\br>";
-      }
-      */
+      //These included, they are needed for the map
+      $css_to_include = array(
+      'sites/all/modules/colorbox/styles/default/colorbox_style.css' => TRUE,
+      'sites/all/modules/islandora_map_browse/css/popup.css' => TRUE,
+      'misc/ui/jquery.ui.core.css' => TRUE,
+      'misc/ui/jquery.ui.theme.css' => TRUE,
+      'sites/all/libraries/leaflet/leaflet.css' => TRUE,
+      'sites/all/libraries/Leaflet.markercluster-master/dist/MarkerCluster.css' => TRUE,
+      'sites/all/libraries/Leaflet.markercluster-master/dist/MarkerCluster.Default.css' => TRUE,
+      'modules/shortcut/shortcut.css' => TRUE,
+      'modules/toolbar/toolbar.css' => TRUE,
+      );
+
+     $css = array_intersect_key($css, $css_to_include);      
     }
   }
-
-/*
-foreach($css as $k => $v){
-  $ctools = drupal_get_path('module','ctools')."/css/ctools.css";
-  if (strcmp($k, $ctools) != 0) {
-    unset($css[$k]);
-  }
-}
-*/
 }
 
 
@@ -285,7 +224,7 @@ function islandora_map_browse_islandora_solr_secondary_display() {
       'file' => 'includes/IslandoraSolrResultsMapView.inc',
       'class' => 'IslandoraSolrResultsMapView',
       'function' => 'mapGEOJSONAll',
-      'description' => 'Display Single Page Results on a Map',
+      'description' => 'Display All Search Results on a Map',
       'logo' => '<img src="' . $path . '/images/map60.png" class="islandora_map_browse">',
     ),
   );
