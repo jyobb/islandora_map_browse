@@ -1,26 +1,23 @@
 <?php
 
 /**
- * Page callback: islandora_map_browse
+ * @file
+ * Page callback: islandora_map_browse.
  *
- * see islandora_map_browse_menu()
+ * See islandora_map_browse_menu()
  */
-
 function map_browse_config($form, &$form_state) {
 
-//http://islandorasev-dev.usask.ca/islandora/search/mods_subject_cartographics_coordinates_mt:[* TO *%?type=edismax&solr_profile=MapView
+  // http://islandorasev-dev.usask.ca/islandora/search/mods_subject_cartographics_coordinates_mt:[* TO *%?type=edismax&solr_profile=MapView.
+  $form['map_browse_all_link'] = array(
 
-$form['map_browse_all_link'] = array(
-  			     
-  '#markup' => "<label>Browse Repository URL</label>".variable_get('map_browse_fedora_base')."/islandora/search/".variable_get('map_browse_coord_field'). ":&#91;*&nbsp;TO&nbsp;*&#93;?type=edismax&solr_profile=MapView",
-);
+    '#markup' => "<label>Browse Repository URL</label>" . variable_get('map_browse_fedora_base') . "/islandora/search/" . variable_get('map_browse_coord_field') . ":&#91;*&nbsp;TO&nbsp;*&#93;?type=edismax&solr_profile=MapView",
+  );
 
-$form['map_generate_link'] = array(
-  			     
-  '#markup' => "<label>Generate Static Map File</label>". '<a href="http://saskhistoryonline.ca/islandora/search/mods_subject_cartographics_coordinates_ms:[* TO *]?type=edismax&solr_profile=&width=1000&height=800&iframe=true&size=full&generate=yes">link</a>');
+  $form['map_generate_link'] = array(
 
-
-
+    '#markup' => "<label>Generate Static Map File</label>" . '<a href="http://saskhistoryonline.ca/islandora/search/mods_subject_cartographics_coordinates_ms:[* TO *]?type=edismax&solr_profile=&width=1000&height=800&iframe=true&size=full&generate=yes">link</a>',
+  );
 
   $form['map_browse_fedora_base'] = array(
     '#type' => 'textfield',
@@ -71,32 +68,31 @@ $form['map_generate_link'] = array(
     '#description' => t('MODS field containing title'),
     '#required' => TRUE,
   );
-/*
+  /*
   $form['js_library'] = array(
 
-      '#type' => 'radios', 
+  '#type' => 'radios',
 
-      '#title' => t('Javascript Library'), 
+  '#title' => t('Javascript Library'),
 
-      '#default_value' => variable_get('js_library'), 
+  '#default_value' => variable_get('js_library'),
 
-      '#options' => array(t('OpenLayers 2'), t('OpenLayers 3'), t('Leaflet JS')),
+  '#options' => array(t('OpenLayers 2'), t('OpenLayers 3'), t('Leaflet JS')),
 
-    );
-*/
-
-/*
-  $form['map_browse_return_area'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Solr Title Field'),
-    '#default_value' => variable_get('map_browse_return_area'),
-    '#cols' => 40,
-    '#rows' => 8,
-    '#description' => t('Fields and titles to display below item separated by ~ '),
-    '#required' => TRUE,
   );
-*/
+   */
 
+  /*
+  $form['map_browse_return_area'] = array(
+  '#type' => 'textarea',
+  '#title' => t('Solr Title Field'),
+  '#default_value' => variable_get('map_browse_return_area'),
+  '#cols' => 40,
+  '#rows' => 8,
+  '#description' => t('Fields and titles to display below item separated by ~ '),
+  '#required' => TRUE,
+  );
+   */
 
   $form['map_browse_return_fields'] = array(
     '#type' => 'textfield',
@@ -117,39 +113,37 @@ $form['map_generate_link'] = array(
     '#description' => t('Centre of the Universe'),
     '#required' => TRUE,
   );
-/*
+  /*
   $form['map_browse_max_rows_to_render'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Maximum items to render'),
-    '#default_value' => variable_get('map_browse_max_row_to_render','2000'),
-    '#size' => 6,
-    '#maxlength' => 12,
-    '#description' => t('This can impact performance'),
-    '#required' => TRUE,
+  '#type' => 'textfield',
+  '#title' => t('Maximum items to render'),
+  '#default_value' => variable_get('map_browse_max_row_to_render','2000'),
+  '#size' => 6,
+  '#maxlength' => 12,
+  '#description' => t('This can impact performance'),
+  '#required' => TRUE,
   );
 
-   $cluster_type = array(0 => t('Item Clustering'));
-   //, 1 => t('Location Clustering'));
+  $cluster_type = array(0 => t('Item Clustering'));
+  //, 1 => t('Location Clustering'));
 
-   $form['map_browse_clustering'] = array(
-    '#type' => 'radios',
-    '#title' => t('Clustering Model'),
-    '#default_value' => 0,
-    '#options' => $cluster_type,
-    '#description' => t('Cluster by locations or items at a location.  Currently not functioning.'),
-    
+  $form['map_browse_clustering'] = array(
+  '#type' => 'radios',
+  '#title' => t('Clustering Model'),
+  '#default_value' => 0,
+  '#options' => $cluster_type,
+  '#description' => t('Cluster by locations or items at a location.  Currently not functioning.'),
+
   );
-*/
-/*
-   $form['build_static_map'] = array(
-      '#type' => 'button', 
-      '#value' => t('Build Static Map File'), 
-      '#weight' => -1,
-      '#submit' => array('build_static_map_submit'),
-   );
-*/
-
-
+   */
+  /*
+  $form['build_static_map'] = array(
+  '#type' => 'button',
+  '#value' => t('Build Static Map File'),
+  '#weight' => -1,
+  '#submit' => array('build_static_map_submit'),
+  );
+   */
 
   return system_settings_form($form);
 
@@ -157,8 +151,7 @@ $form['map_generate_link'] = array(
 
 /*
 function islandora_map_browse_build_static_map_submit($form, &$form_state) {
-  //drupal_flush_all_caches();
-  drupal_set_message(t('File Created.'));
+// drupal_flush_all_caches();
+drupal_set_message(t('File Created.'));
 }
-*/
-
+ */
