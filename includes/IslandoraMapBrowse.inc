@@ -67,16 +67,13 @@ function view_all_results() {
  *
  */
 function prepareStaticMapGEOJSONConfig ($response_data) {
-  // $withVal = 0;
-  // $withoutVal = 0;.
-  $uniqueItems = 0;
 
+  $uniqueItems = 0;
   $mods_location = variable_get('map_browse_coord_field');
   $map_centre = explode(",", variable_get('map_browse_map_centre'));
   $centre_lat = trim($map_centre[0]);
   $centre_lon = trim($map_centre[1]);
 
-  /***************************************************************/
   /*****Parse for leaflet *******************/
   $leafletData = array();
   foreach ($response_data['objects'] as $object_result) {
@@ -84,10 +81,8 @@ function prepareStaticMapGEOJSONConfig ($response_data) {
     $doc = $object_result['solr_doc'];
     $thumb = $object_result['thumbnail_url'];
     $obj = $object_result['object_url'];
-    //$coordinatesLatLon = NULL;
     // Need to put a check in here to avoid the undefined index error.
     if (isset($doc[$mods_location]) && $doc[$mods_location] != '') {
-      // $withVal++;.
       $parts = explode(",", $doc[$mods_location][0]);
       // Check to see if the location is in the correct format.  If not report to error log.
       if (!isset($parts[1]) || !isset($parts[1])) {
@@ -97,9 +92,7 @@ function prepareStaticMapGEOJSONConfig ($response_data) {
 
         $lat = floatval($parts[0]);
         $lon = floatval($parts[1]);
-
         $displayFields = explode(",", variable_get('map_browse_return_fields'));
-        //$tdisplayFields = array();
 
         // Check to see if the record 'doc' has any of the fields configured for display
         // For now hard code in the proper field names.  Maybe get this a configuration option or grab from
@@ -107,12 +100,9 @@ function prepareStaticMapGEOJSONConfig ($response_data) {
         $displayNames = array("dc.contributor" => "Contributor", "mods_location_physicalLocation_ms" => "Physical Location", "dc.publisher" => "Publisher");
         $confFields = '';
         $uniqueItems = $uniqueItems + 1;
-        //foreach ($displayFields as $k => $v) {
         foreach ($displayFields as $v) {
           $tv = trim($v);
-          //$tdisplayFields[$tv] = $tv;
           if (array_key_exists($tv, $doc) && $doc[$tv][0] != '') {
-            //$props[$tv] = $doc[$tv];
             if (strcmp($confFields, '') == 0) {
               $confFields = '<p>' . $displayNames[$tv] . ': ' . $doc[$tv][0] . '</p>';
             }
@@ -144,11 +134,6 @@ function prepareStaticMapGEOJSONConfig ($response_data) {
   $pinInfo['uniqueItems'] = $uniqueItems;
   $pinInfo['uniqueLocations'] = count($leafletData);
 
-  // var_dump($_SERVER);
-  if (strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== FALSE) {
-    // Echo "found zip";
-    //   ob_start(ob_gzhandler);
-  }
   // Encode everything that goes to JS.
   $jsPinInfo = json_encode($pinInfo);
   drupal_add_js(array('islandora_map_browse_settings_centreLat' => $centre_lat), 'setting');
@@ -194,46 +179,28 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
    *   html output for the resultset.
    */
   function mapGEOJSONResults($solrQueryProcessor) {
-
     $page = 0;
-    $url_args = array();
-    $url_args = parse_str(parse_url($_SERVER['HTTP_REFERER'], PHP_URL_QUERY));
-    $size = '';
-    // drupal_set_message(var_dump($_GET));
     $increment = 20;
     $lowerlimit = ((($page + 1) * $increment) - $increment);
 
     // Set up the variables that get passed to javascript.
     $this->prepareGEOJSONVariablesConfig($solrQueryProcessor);
-
-    // $queryInfoForJS = array();
     $response_data = $solrQueryProcessor->islandoraSolrResult['response'];
-
-    // Dump the following into drupal set message to see what your dealing with var_dump to debug.
-    $res = $solrQueryProcessor;
 
     // The fields added here are required.
     $fl_params = "PID, RELS_EXT_hasModel_uri_ms, " . variable_get('map_browse_return_fields') . ", " . variable_get('map_browse_title_field') . ", " . variable_get('map_browse_coord_field');
-    // RELS_EXT_hasModel_uri_ms, mods_location_url_ms,
-    // var_dump($fl_params);
     $solrQueryProcessor->solrParams['fl'] = array($fl_params);
 
     // This section resets the limits on the query and re-executes.
     $upperlimit = $solrQueryProcessor->islandoraSolrResult['response']['numFound'];
-
     $solrQueryProcessor->solrStart = $lowerlimit;
     $solrQueryProcessor->solrLimit = $increment;
-
     $solrQueryProcessor->resetResults();
     $solrQueryProcessor->executeQuery(FALSE);
     $response_data = $solrQueryProcessor->islandoraSolrResult['response'];
-
     $out = $this->prepareSolrResultsGEOJSONConfig($response_data);
-
     return $out;
 
-    // $cont = render($out,NULL);
-    // return ctools_modal_render("title", $cont);
   }//End of mapPageResults
 
   /**
@@ -244,8 +211,6 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
   function mapGEOJSONAll($solrQueryProcessor) {
 
     $page = 0;
-    $url_args = array();
-
     // Use this to make a bit where I get all the geolocated stuff and write to file.
     $size = 'small';
     if (array_key_exists('size', $_GET)) {
@@ -259,27 +224,11 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
     $cwd = getcwd();
     $path = drupal_get_path('module', 'islandora_map_browse');
     $dataPath = $cwd . "/" . $path . "/data/AllGEOLocated.json";
-
-    // Check to see if the pregenerated file exists
-    /*
-    if(file_exists($dataPath) == 1){
-
-    $response_data = json_decode(file_get_contents($dataPath), true);
-
-    $this->prepareGEOJSONVariablesConfig($solrQueryProcessor);
-    $out = $this->prepareSolrResultsGEOJSONConfig($response_data);
-    watchdog("islandora_map_browse", "using file");
-    }else{
-
-    watchdog("islandora_map_browse", "generating new AllGEOLocated file");
-     */
     $increment = 13000;
     $lowerlimit = ((($page + 1) * $increment) - $increment);
-    // drupal_set_message(var_dump($_GET));
+
     // Set up the variables that get passed to javascript.
     $this->prepareGEOJSONVariablesConfig($solrQueryProcessor);
-
-    // $queryInfoForJS = array();
     $response_data = $solrQueryProcessor->islandoraSolrResult['response'];
 
     // Dump the following into drupal set message to see what your dealing with var_dump to debug.
@@ -287,24 +236,20 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
 
     // The fields added here are required.
     $fl_params = "PID, RELS_EXT_hasModel_uri_ms, " . variable_get('map_browse_return_fields') . ", " . variable_get('map_browse_title_field') . ", " . variable_get('map_browse_coord_field');
-    // RELS_EXT_hasModel_uri_ms, mods_location_url_ms,
-    // var_dump($fl_params);
     $solrQueryProcessor->solrParams['fl'] = array($fl_params);
 
     // This section resets the limits on the query and re-executes.
-    $upperlimit = $solrQueryProcessor->islandoraSolrResult['response']['numFound'];
-
     $solrQueryProcessor->solrStart = $lowerlimit;
     $solrQueryProcessor->solrLimit = $increment;
-
     $solrQueryProcessor->resetResults();
     $solrQueryProcessor->executeQuery(FALSE);
     $response_data = $solrQueryProcessor->islandoraSolrResult['response'];
+
     if (strcmp($gen, 'yes') == 0) {
       file_put_contents($dataPath, json_encode($response_data));
     }
-    $out = $this->prepareSolrResultsGEOJSONConfig($response_data);
 
+    $out = $this->prepareSolrResultsGEOJSONConfig($response_data);
     return $out;
 
   }//End of mapPageResults
@@ -382,7 +327,6 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
       $doc = $object_result['solr_doc'];
       $thumb = $object_result['thumbnail_url'];
       $obj = $object_result['object_url'];
-      //$coordinatesLatLon = NULL;
 
       // Need to put a check in here to avoid the undefined index error.
       if (isset($doc[$mods_location]) && $doc[$mods_location] != '') {
@@ -395,7 +339,6 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
           $lat = floatval($parts[0]);
           $lon = floatval($parts[1]);
           $displayFields = explode(",", variable_get('map_browse_return_fields'));
-          //$tdisplayFields = array();
 
           // Check to see if the record 'doc' has any of the fields configured for display
           // For now hard code in the proper field names.  Maybe get this a configuration option or grab from
@@ -403,12 +346,9 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
           $displayNames = array("dc.contributor" => "Contributor", "mods_location_physicalLocation_ms" => "Physical Location", "dc.publisher" => "Publisher");
           $confFields = '';
           $uniqueItems = $uniqueItems + 1;
-          //foreach ($displayFields as $k => $v) {
           foreach ($displayFields as $v) {
             $tv = trim($v);
-            //$tdisplayFields[$tv] = $tv;
             if (array_key_exists($tv, $doc) && $doc[$tv][0] != '') {
-              //$props[$tv] = $doc[$tv];
               if (strcmp($confFields, '') == 0) {
                 $confFields = '<p>' . $displayNames[$tv] . ': ' . $doc[$tv][0] . '</p>';
               }
@@ -418,7 +358,6 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
             }
           }
 
-          // watchdog("map view", $doc['dc.title']);.
           $title = $doc['dc.title'][0];
           $baseURL = variable_get('map_browse_fedora_base');
           $contentString = '<h2><a target="_blank" href="' . $baseURL . '/' . $obj . '"/>' . $title . '</a></h2><img src="' . $baseURL . '/' . $thumb . '">' . $confFields;
@@ -436,8 +375,6 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
       }
     }
 
-    // $pinInfo['pinsCount'] = $withVal;
-    // $pinInfo['nopinsCount'] = $withoutVal;.
     $pinInfo['uniqueItems'] = $uniqueItems;
     $pinInfo['uniqueLocations'] = count($leafletData);
 
