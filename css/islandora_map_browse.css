@@ -1,29 +1,30 @@
 body {
-//background-color: #AEACA9;
-background-size: 100%;
-font-family: Open Sans,Arial,Century gothic, sans-serif;
-color: #414042;
-font-size: 14px;
-font-weight: 400;
+  //background-color: #aeaca9;
+  background-size: 100%;
+  font-family: Open Sans,Arial,Century gothic, sans-serif;
+  color: #414042;
+  font-size: 14px;
+  font-weight: 400;
 }
 
 #skip-link {
-    display:none;
+  display: none;
 }
 
-//#cboxWrapper {
-// background: #000;
-//} 
+//cboxWrapper {
+  // background: #000;
+  //
+}
 
 #info_canvas {
- //background: #EEEEEE;
+  //background: #eeeeee;
 }
 
 //.region-content {
-//background: #000;
-//}
+  //background: #000;
+  //
+}
 
 #toolbar {
-//display:none;
-
+  //display: none;
 }
