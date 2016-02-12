@@ -5,14 +5,13 @@
  * Theme functions for the Islandora Solr Search module.
  */
 
-// page + elements
+// Page + elements
 // islandora-solr-search.tpl.php
-// 
+//
 // solr search results
-// islandora-solr-search-default.tpl.php
-
+// islandora-solr-search-default.tpl.php.
 /**
- * hook_preprocess function for islandora_solr_search
+ * Hook_preprocess function for islandora_solr_search.
  */
 
 /*
@@ -24,8 +23,8 @@ function islandora_solr_config_preprocess(&$variables) {
   // elements
   $elements = $variables['elements'];
 
-//print_r($variables);
-  
+// print_r($variables);
+
   // make all variables in 'elements' available as variables in the template file
   foreach ($variables['elements'] as $key => $value) {
     $variables[$key] = $value;
@@ -34,7 +33,7 @@ function islandora_solr_config_preprocess(&$variables) {
   // results count
   $total = $elements['solr_total'];
   $end = $elements['solr_end'];
-  $start = $elements['solr_start'] + ($total > 0 ? 1 : 0);  
+  $start = $elements['solr_start'] + ($total > 0 ? 1 : 0);
   // construct string
   $islandora_solr_result_count = t('(@start - @end of @total)', array('@start' => $start, '@end' => $end, '@total' => $total));
   // add to variables
@@ -42,65 +41,66 @@ function islandora_solr_config_preprocess(&$variables) {
 
 
 }
-*/
+ */
 
 
 
-/** hook_preprocess function for islandora_solr_search_default
+/**
+ * Hook_preprocess function for islandora_solr_search_default.
  */
 function islandora_solr_config_preprocess(&$variables) {
-  // base url
+  // Base url.
   global $base_url;
-  // base path
+  // Base path.
   global $base_path;
-//echo "processing";
-  // Load external code to probe object datastreams
+  // Echo "processing";
+  // Load external code to probe object datastreams.
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
 
-  // set base url
+  // Set base url.
   $variables['base_url'] = $base_url;
 
-  //print $base_path;
-  // set base path
+  // Print $base_path;
+  // set base path.
   $variables['base_path'] = $base_path;
-  
- // get path
+
+  // Get path.
   $path = $base_path . drupal_get_path('module', 'islandora_solr_config');
 
-
-  // placeholder image
+  // Placeholder image.
   $solr_default_img = $path . '/images/defaultimg.png';
   $variables['elements']['solr_default_img'] = $solr_default_img;
 
-  // make all variables in 'elements' available as variables in the template file
+  // Make all variables in 'elements' available as variables in the template file.
   foreach ($variables['elements'] as $key => $value) {
     $variables[$key] = $value;
   }
 
-  // detect existing datastreams and create a linked thumbnail if TN exists
-if(is_array($variables['results'])){
-  foreach($variables['results'] as $key => $value) {
-    $object = new Fedora_Item($value['PID']['value']);
-    $ds_array = $object->get_datastreams_list_as_array();
+  // Detect existing datastreams and create a linked thumbnail if TN exists.
+  if (is_array($variables['results'])) {
+    foreach ($variables['results'] as $key => $value) {
+      $object = new Fedora_Item($value['PID']['value']);
+      $ds_array = $object->get_datastreams_list_as_array();
 
-    if (array_key_exists('TN', $ds_array) && (isset($variables['results'][$key]['PID']['value']))) {
-      $pid = $variables['results'][$key]['PID']['value'];
-      $solr_object_link = 'fedora/repository/' . $pid;
-      $solr_thumbnail_img = '<img src="' . $base_path . $solr_object_link . '/TN"' . '/>';
-      
-      if(isset($variables['results'][$key]['imageLink']['value'])){		
-	$solr_object_link = $variables['results'][$key]['imageLink']['value'];
-	$variables['solr_thumbnail'][$key] = l($solr_thumbnail_img, $solr_object_link, array('html' => TRUE, 'attributes' => array('title' => $variables['results'][$key]['dc.title']['value'])));
-	$variables['imageLink'][$key] = $solr_object_link;      
-	unset($variables['results'][$key]['imageLink']);
-      }else{
-	$variables['solr_thumbnail'][$key] = l($solr_thumbnail_img, $solr_object_link, array('html' => TRUE, 'attributes' => array('title' => $variables['results'][$key]['dc.title']['value'])));
+      if (array_key_exists('TN', $ds_array) && (isset($variables['results'][$key]['PID']['value']))) {
+        $pid = $variables['results'][$key]['PID']['value'];
+        $solr_object_link = 'fedora/repository/' . $pid;
+        $solr_thumbnail_img = '<img src="' . $base_path . $solr_object_link . '/TN"' . '/>';
+
+        if (isset($variables['results'][$key]['imageLink']['value'])) {
+          $solr_object_link = $variables['results'][$key]['imageLink']['value'];
+          $variables['solr_thumbnail'][$key] = l($solr_thumbnail_img, $solr_object_link, array('html' => TRUE, 'attributes' => array('title' => $variables['results'][$key]['dc.title']['value'])));
+          $variables['imageLink'][$key] = $solr_object_link;
+          unset($variables['results'][$key]['imageLink']);
+        }
+        else {
+          $variables['solr_thumbnail'][$key] = l($solr_thumbnail_img, $solr_object_link, array('html' => TRUE, 'attributes' => array('title' => $variables['results'][$key]['dc.title']['value'])));
+        }
       }
-    }else {
-      $variables['solr_thumbnail'][$key] = '<img src="' . $path . '/images/defaultimg.png' . '"/>';
+      else {
+        $variables['solr_thumbnail'][$key] = '<img src="' . $path . '/images/defaultimg.png' . '"/>';
+      }
     }
-  }
-}//end array test
-  
-}
+  }//end array test
 
+}
