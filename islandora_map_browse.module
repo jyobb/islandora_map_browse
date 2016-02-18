@@ -9,8 +9,8 @@
  * *
  */
 function islandora_map_browse_init() {
-  drupal_add_css(drupal_get_path('module', 'islandora_map_browse') .
-     '/css/islandora_map_browse.css');
+
+
 }
 
 /**
@@ -35,6 +35,7 @@ function islandora_map_browse_theme() {
     ),
   );
 }
+
 
 /**
  * @param drupal page variables and hook
@@ -72,8 +73,8 @@ function islandora_map_browse_css_alter(&$css) {
         'misc/ui/jquery.ui.core.css' => TRUE,
         'misc/ui/jquery.ui.theme.css' => TRUE,
         'sites/all/libraries/leaflet/leaflet.css' => TRUE,
-        'sites/all/libraries/Leaflet.markercluster-master/dist/MarkerCluster.css' => TRUE,
-        'sites/all/libraries/Leaflet.markercluster-master/dist/MarkerCluster.Default.css' => TRUE,
+        'sites/all/libraries/Leaflet.markercluster-leaflet-0.7/dist/MarkerCluster.css' => TRUE,
+        'sites/all/libraries/Leaflet.markercluster-leaflet-0.7/dist/MarkerCluster.Default.css' => TRUE,
         'modules/shortcut/shortcut.css' => TRUE,
         'modules/toolbar/toolbar.css' => TRUE,
       );
@@ -167,7 +168,7 @@ function islandora_map_browse_menu() {
     'title' => 'View Geolocated Items',
     'description' => 'View collection map',
     'page callback' => array('view_all_results'),
-    'file' => 'includes/IslandoraSolrResultsMapView.inc',
+    'file' => 'includes/IslandoraMapBrowse.inc',
     'access arguments' => array('access content'),
     'type' => MENU_NORMAL_ITEM,
   );
@@ -205,8 +206,8 @@ function islandora_map_browse_islandora_solr_secondary_display() {
     'MapGEOJSONView' => array(
       'name' => t('Single page GeoJSON View'),
       'module' => 'islandora_map_browse',
-      'file' => 'includes/IslandoraSolrResultsMapView.inc',
-      'class' => 'IslandoraSolrResultsMapView',
+      'file' => 'includes/IslandoraMapBrowse.inc',
+      'class' => 'IslandoraMapBrowse',
       'function' => 'mapGEOJSONResults',
       'description' => 'Display Single Page Results on a Map',
       'logo' => '<img src="' . $path . '/images/map60.png" class="islandora_map_browse">',
@@ -214,8 +215,8 @@ function islandora_map_browse_islandora_solr_secondary_display() {
     'MapGEOJSONViewAll' => array(
       'name' => t('All Geojson'),
       'module' => 'islandora_map_browse',
-      'file' => 'includes/IslandoraSolrResultsMapView.inc',
-      'class' => 'IslandoraSolrResultsMapView',
+      'file' => 'includes/IslandoraMapBrowse.inc',
+      'class' => 'IslandoraMapBrowse',
       'function' => 'mapGEOJSONAll',
       'description' => 'Display All Search Results on a Map',
       'logo' => '<img src="' . $path . '/images/map60.png" class="islandora_map_browse">',

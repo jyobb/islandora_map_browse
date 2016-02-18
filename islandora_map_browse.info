@@ -4,6 +4,6 @@ core = 7.x
 package = USask
 dependencies[] = ctools
 dependencies[] = colorbox
-
+stylesheets[all][] = css/islandora_map_browse.css
 ;NEW LINE
 configure = admin/islandora/mapbrowse
