@@ -37,6 +37,7 @@ function view_all_results() {
     // Send javascript to page.
     drupal_add_js(array('islandora_map_browse_settings_jsInfo' => $jsInfo), 'setting');
     drupal_add_js(drupal_get_path('module', 'islandora_map_browse') . '/js/open_map_GEOJSON_location_config.js', 'file');
+
     // Add leaflet libraries.
     $leaflet_path = libraries_get_path('leaflet');
     if ($leaflet_path != FALSE) {
@@ -47,7 +48,7 @@ function view_all_results() {
       watchdog("islandora_map_view", "Leaflet Library not found");
     }
 
-    $cluster_path = libraries_get_path('Leaflet.markercluster-master');
+    $cluster_path = libraries_get_path('Leaflet.markercluster-leaflet-0.7');
     if ($cluster_path != FALSE) {
       // Add clustering.
       drupal_add_css($cluster_path . '/dist/MarkerCluster.css', 'module', 'all', 'false');
@@ -74,6 +75,13 @@ function prepareStaticMapGEOJSONConfig ($response_data) {
   $centre_lat = trim($map_centre[0]);
   $centre_lon = trim($map_centre[1]);
 
+  $displayArr = explode("|", variable_get('map_browse_return_fields'));
+  foreach($displayArr as $v){
+    $nameField = explode(",", $v);
+    $field = trim ($nameField[1]);
+    $displayFields[$field] = trim($nameField[0]); 
+  }
+
   /*****Parse for leaflet *******************/
   $leafletData = array();
   foreach ($response_data['objects'] as $object_result) {
@@ -89,25 +97,22 @@ function prepareStaticMapGEOJSONConfig ($response_data) {
         watchdog("mods_location bad format", "See: " . $doc['PID']);
       }
       else {
-
         $lat = floatval($parts[0]);
         $lon = floatval($parts[1]);
-        $displayFields = explode(",", variable_get('map_browse_return_fields'));
 
-        // Check to see if the record 'doc' has any of the fields configured for display
-        // For now hard code in the proper field names.  Maybe get this a configuration option or grab from
-        // the solr module.
-        $displayNames = array("dc.contributor" => "Contributor", "mods_location_physicalLocation_ms" => "Physical Location", "dc.publisher" => "Publisher");
+        /* Check to see if the record 'doc' has any of the fields configured for display
+         * Add those that exist and ignore others
+         */
         $confFields = '';
         $uniqueItems = $uniqueItems + 1;
-        foreach ($displayFields as $v) {
-          $tv = trim($v);
-          if (array_key_exists($tv, $doc) && $doc[$tv][0] != '') {
+        foreach ($displayFields as $k => $v) {
+	//Check the document to make sure the display item exists
+          if (array_key_exists($k, $doc) && $doc[$k][0] != '') {
             if (strcmp($confFields, '') == 0) {
-              $confFields = '<p>' . $displayNames[$tv] . ': ' . $doc[$tv][0] . '</p>';
+              $confFields = '<p>' . $v . ': ' . $doc[$k][0] . '</p>';
             }
             else {
-              $confFields = '<p>' . $displayNames[$tv] . ': ' . $doc[$tv][0] . '</p>' . $confFields;
+              $confFields = '<p>' . $v . ': ' . $doc[$k][0] . '</p>' . $confFields;
             }
           }
         }
@@ -122,11 +127,6 @@ function prepareStaticMapGEOJSONConfig ($response_data) {
         else {
           $leafletData["$lat" . "$lon"] = array("lat" => $lat, "lon" => $lon, "content" => $contentString);
         }
-      }
-    }
-    else {
-      if (strcmp($doc["RELS_EXT_hasModel_uri_ms"]['0'], "info:fedora/islandora:collectionCModel") != 0) {
-        // $withoutVal++;.
       }
     }
   }
@@ -147,9 +147,6 @@ function prepareStaticMapGEOJSONConfig ($response_data) {
   return $output;
 
 }
-
-
-
 
 
 /**
@@ -183,16 +180,24 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
     $increment = 20;
     $lowerlimit = ((($page + 1) * $increment) - $increment);
 
+    //Get user configurable fields
+    $configFields = "";
+    $displayArr = explode("|", variable_get('map_browse_return_fields'));
+    foreach($displayArr as $v){
+      $nameField = explode(",", $v);
+      $configFields .= trim ($nameField[1]) . ', ';
+    }
+
     // Set up the variables that get passed to javascript.
     $this->prepareGEOJSONVariablesConfig($solrQueryProcessor);
     $response_data = $solrQueryProcessor->islandoraSolrResult['response'];
 
     // The fields added here are required.
-    $fl_params = "PID, RELS_EXT_hasModel_uri_ms, " . variable_get('map_browse_return_fields') . ", " . variable_get('map_browse_title_field') . ", " . variable_get('map_browse_coord_field');
+    $fl_params = "PID, RELS_EXT_hasModel_uri_ms, " . $configFields . variable_get('map_browse_title_field') . ", " . variable_get('map_browse_coord_field');
+
     $solrQueryProcessor->solrParams['fl'] = array($fl_params);
 
     // This section resets the limits on the query and re-executes.
-    $upperlimit = $solrQueryProcessor->islandoraSolrResult['response']['numFound'];
     $solrQueryProcessor->solrStart = $lowerlimit;
     $solrQueryProcessor->solrLimit = $increment;
     $solrQueryProcessor->resetResults();
@@ -200,8 +205,7 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
     $response_data = $solrQueryProcessor->islandoraSolrResult['response'];
     $out = $this->prepareSolrResultsGEOJSONConfig($response_data);
     return $out;
-
-  }//End of mapPageResults
+  }
 
   /**
    * Fuction called by the secondary display profile to create map
@@ -211,11 +215,6 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
   function mapGEOJSONAll($solrQueryProcessor) {
 
     $page = 0;
-    // Use this to make a bit where I get all the geolocated stuff and write to file.
-    $size = 'small';
-    if (array_key_exists('size', $_GET)) {
-      $size = $_GET['size'];
-    }
 
     if (array_key_exists('generate', $_GET)) {
       $gen = $_GET['generate'];
@@ -231,11 +230,17 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
     $this->prepareGEOJSONVariablesConfig($solrQueryProcessor);
     $response_data = $solrQueryProcessor->islandoraSolrResult['response'];
 
-    // Dump the following into drupal set message to see what your dealing with var_dump to debug.
-    $res = $solrQueryProcessor;
+    $configFields = "";
+    $displayArr = explode("|", variable_get('map_browse_return_fields'));
+    foreach($displayArr as $v){
+      $nameField = explode(",", $v);
+      $configFields .= trim ($nameField[1]) . ', ';
+    }
 
     // The fields added here are required.
-    $fl_params = "PID, RELS_EXT_hasModel_uri_ms, " . variable_get('map_browse_return_fields') . ", " . variable_get('map_browse_title_field') . ", " . variable_get('map_browse_coord_field');
+    //$fl_params = "PID, RELS_EXT_hasModel_uri_ms, " . variable_get('map_browse_return_fields') . ", " . variable_get('map_browse_title_field') . ", " . variable_get('map_browse_coord_field');
+    //$fl_params = "PID, RELS_EXT_hasModel_uri_ms, " . " dc.contributor, dc.publisher, mods_location_physicalLocation_ms" . ", " . variable_get('map_browse_title_field') . ", " . variable_get('map_browse_coord_field');
+    $fl_params = "PID, RELS_EXT_hasModel_uri_ms, " . $configFields . variable_get('map_browse_title_field') . ", " . variable_get('map_browse_coord_field');
     $solrQueryProcessor->solrParams['fl'] = array($fl_params);
 
     // This section resets the limits on the query and re-executes.
@@ -252,7 +257,7 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
     $out = $this->prepareSolrResultsGEOJSONConfig($response_data);
     return $out;
 
-  }//End of mapPageResults
+  }
 
 
   /**
@@ -289,7 +294,7 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
       watchdog("islandora_map_view", "Leaflet Library not found");
     }
 
-    $cluster_path = libraries_get_path('Leaflet.markercluster-master');
+    $cluster_path = libraries_get_path('Leaflet.markercluster-leaflet-0.7');
     if ($cluster_path != FALSE) {
       // Add clustering.
       drupal_add_css($cluster_path . '/dist/MarkerCluster.css', 'module', 'all', 'false');
@@ -320,8 +325,14 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
     $centre_lat = trim($map_centre[0]);
     $centre_lon = trim($map_centre[1]);
 
-    /***************************************************************/
-    /*****Parse for leaflet *******************/
+  $displayArr = explode("|", variable_get('map_browse_return_fields'));
+  foreach($displayArr as $v){
+    $nameField = explode(",", $v);
+    $field = trim ($nameField[1]);
+    $displayFields[$field] = trim($nameField[0]); 
+  }
+
+    //Parse for leaflet
     $leafletData = array();
     foreach ($response_data['objects'] as $object_result) {
       $doc = $object_result['solr_doc'];
@@ -338,22 +349,18 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
         else {
           $lat = floatval($parts[0]);
           $lon = floatval($parts[1]);
-          $displayFields = explode(",", variable_get('map_browse_return_fields'));
 
           // Check to see if the record 'doc' has any of the fields configured for display
-          // For now hard code in the proper field names.  Maybe get this a configuration option or grab from
-          // the solr module.
-          $displayNames = array("dc.contributor" => "Contributor", "mods_location_physicalLocation_ms" => "Physical Location", "dc.publisher" => "Publisher");
           $confFields = '';
           $uniqueItems = $uniqueItems + 1;
-          foreach ($displayFields as $v) {
-            $tv = trim($v);
-            if (array_key_exists($tv, $doc) && $doc[$tv][0] != '') {
+          foreach ($displayFields as $k => $v) {
+            //$tv = trim($v);
+            if (array_key_exists($k, $doc) && $doc[$k][0] != '') {
               if (strcmp($confFields, '') == 0) {
-                $confFields = '<p>' . $displayNames[$tv] . ': ' . $doc[$tv][0] . '</p>';
+                $confFields = '<p>' . $v . ': ' . $doc[$k][0] . '</p>';
               }
               else {
-                $confFields = '<p>' . $displayNames[$tv] . ': ' . $doc[$tv][0] . '</p>' . $confFields;
+                $confFields = '<p>' . $v . ': ' . $doc[$k][0] . '</p>' . $confFields;
               }
             }
           }
@@ -396,4 +403,4 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
 
   }
 
-}//End of class
+}
