@@ -9,7 +9,7 @@
 function map_browse_config($form, &$form_state) {
 
   $form['map_browse_all_link'] = array(
-    '#markup' => "<label>Browse Repository URL</label>" . variable_get('map_browse_fedora_base') . "/islandora/search/" . variable_get('map_browse_coord_field') . ":&#91;*&nbsp;TO&nbsp;*&#93;?type=edismax&solr_profile=MapView",
+    '#markup' => "<label>Browse Repository URL</label>" . variable_get('map_browse_fedora_base') . "/browsemap",
   );
 
   $form['map_generate_link'] = array(
@@ -72,7 +72,7 @@ function map_browse_config($form, &$form_state) {
     '#default_value' => variable_get('map_browse_return_fields', 'subject, dc.subject | description, dc.description'),
     '#cols' => 100,
     '#rows' => 5,
-    '#description' => t('Fields to be displayed on the map points'),
+    '#description' => t('Fields to be displayed on map popups. The format of this field is: Field Name , solr.field |Field Name2 , solr.field2 | etc...'),
     '#required' => TRUE,
   );
 
