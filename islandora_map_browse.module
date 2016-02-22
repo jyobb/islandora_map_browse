@@ -204,7 +204,7 @@ function islandora_map_browse_islandora_solr_secondary_display() {
   $path = $base_path . drupal_get_path('module', 'islandora_map_browse');
   return array(
     'MapGEOJSONView' => array(
-      'name' => t('Single page GeoJSON View'),
+      'name' => t('Single page map view'),
       'module' => 'islandora_map_browse',
       'file' => 'includes/IslandoraMapBrowse.inc',
       'class' => 'IslandoraMapBrowse',
@@ -213,13 +213,13 @@ function islandora_map_browse_islandora_solr_secondary_display() {
       'logo' => '<img src="' . $path . '/images/map60.png" class="islandora_map_browse">',
     ),
     'MapGEOJSONViewAll' => array(
-      'name' => t('All Geojson'),
+      'name' => t('View all search results on a map'),
       'module' => 'islandora_map_browse',
       'file' => 'includes/IslandoraMapBrowse.inc',
       'class' => 'IslandoraMapBrowse',
       'function' => 'mapGEOJSONAll',
       'description' => 'Display All Search Results on a Map',
-      'logo' => '<img src="' . $path . '/images/map60.png" class="islandora_map_browse">',
+      'logo' => '<img src="' . $path . '/images/mapmulti60.png" class="islandora_map_browse">',
     ),
   );
 }
