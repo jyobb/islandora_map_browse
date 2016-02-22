@@ -8,11 +8,12 @@ Modules
 * [Islandora Solr Search](http://github.com/islandora/islandora_solr_search)
 
 Libraries
-* [Leaflet.js - v. 0.7.3](http://leaflet-cdn.s3.amazonaws.com/build/leaflet-0.7.3.zip)
+* [Leaflet.js - v. 0.7.7](http://leafletjs.com/download.html)
    * create a directory called leaflet in sites/all/libraries
    * cd to the leaflet directory, download the zip file and unzip it
-* [Leaflet Marker Cluster](https://github.com/Leaflet/Leaflet.markercluster.git)
-   * install in sites/all/libraries/Leaflet.markercluster-master
+
+* [Leaflet Marker Cluster](https://github.com/Leaflet/Leaflet.markercluster/tree/leaflet-0.7)
+   * install in sites/all/libraries/Leaflet.markercluster
 
 ## Configuration
 
@@ -22,12 +23,12 @@ To enable Islandora Map Browse you will need to configure gsearch to index mods 
 
 There are several configuration settings you should review and the module configuration is available on this drupal path - admin/islandora/mapbrowse.
 
-* Islandora Base URL - uum, the base url? 
+* Islandora Base URL - http://yourFedoraHostname.ca
 * Islandora base prefix - everything before the PID
 * Fedora base thumbnail suffix - everything after the PID for the thumbnail view
 * Solr coordinate field - the solr field containing the lat, long
 * Solr Title field - the solr field containing the title
-* Fields to return from solr - these are shown below the thumbnail on the map popup
+* Fields to return from solr - these are shown below the thumbnail on the map popup. If a field does not exist for a record it is ignored. Fields need to be added in the following format: Field Name1, field.solr1 | Field Name2, field.solr2. Commas separate Field names from solr fields, | separate each field.
 * Default map centre - the center of the world as you know it.
 * Maximum items to render - for safety, returning extra items is not yet handled  
 
@@ -38,8 +39,8 @@ There are several configuration settings you should review and the module config
 
 After enabling the Islandora Map Browse module two new secondary display profiles are made available in the Solr Index configuration.
 
-* **View All Results on Map** which displays all the search results on a map
-* **Paged Map View** which display the current search results page on a map
+* **View all search results on map** which displays all the search results on a map
+* **Single paged map view** which display the current search results page on a map
 
 Selecting one of these secondary displays adds a folded map icon to the search results. Selecting the icon launches the map display.
 
