@@ -32,7 +32,7 @@ There are several configuration settings you should review and the module config
 * Default map centre - the center of the world as you know it.
 * Maximum items to render - for safety, returning extra items is not yet handled  
 
-![Configuration Options](https://raw.githubusercontent.com/dmoses/islandora_screenshots/master/islandora_map_browse_config.jpg "Configuration Options")
+![Configuration Options](https://raw.githubusercontent.com/jyobb/islandora_map_browse/master/islandora_map_browse_config.png "Configuration Options")
 
 
 ### Configuring Islandora Solr Search
