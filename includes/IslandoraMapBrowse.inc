@@ -117,7 +117,9 @@ function prepareStaticMapGEOJSONConfig ($response_data) {
           }
         }
 
-        $title = $doc['dc.title'][0];
+        //$title = $doc['dc.title'][0];
+	$solrTitle = variable_get('map_browse_title_field');
+        $title = $doc[$solrTitle][0];
         $baseURL = variable_get('map_browse_fedora_base');
         $contentString = '<h2><a target="_blank" href="' . $baseURL . '/' . $obj . '"/>' . $title . '</a></h2><img src="' . $baseURL . '/' . $thumb . '">' . $confFields;
 
@@ -238,8 +240,6 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
     }
 
     // The fields added here are required.
-    //$fl_params = "PID, RELS_EXT_hasModel_uri_ms, " . variable_get('map_browse_return_fields') . ", " . variable_get('map_browse_title_field') . ", " . variable_get('map_browse_coord_field');
-    //$fl_params = "PID, RELS_EXT_hasModel_uri_ms, " . " dc.contributor, dc.publisher, mods_location_physicalLocation_ms" . ", " . variable_get('map_browse_title_field') . ", " . variable_get('map_browse_coord_field');
     $fl_params = "PID, RELS_EXT_hasModel_uri_ms, " . $configFields . variable_get('map_browse_title_field') . ", " . variable_get('map_browse_coord_field');
     $solrQueryProcessor->solrParams['fl'] = array($fl_params);
 
@@ -365,7 +365,9 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
             }
           }
 
-          $title = $doc['dc.title'][0];
+          //$title = $doc['dc.title'][0];
+        $solrTitle = variable_get('map_browse_title_field');
+        $title = $doc[$solrTitle][0];
           $baseURL = variable_get('map_browse_fedora_base');
           $contentString = '<h2><a target="_blank" href="' . $baseURL . '/' . $obj . '"/>' . $title . '</a></h2><img src="' . $baseURL . '/' . $thumb . '">' . $confFields;
           if (array_key_exists("$lat" . "$lon", $leafletData)) {
@@ -385,8 +387,8 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
     $pinInfo['uniqueItems'] = $uniqueItems;
     $pinInfo['uniqueLocations'] = count($leafletData);
 
-    if (strpos($_SERVER[‘HTTP_ACCEPT_ENCODING’], ‘gzip’) !== FALSE) {
-      ob_start(“ob_gzhandler”);
+    if (strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== FALSE) {
+      ob_start('ob_gzhandler');
     }
 
     // Encode everything that goes to JS.
