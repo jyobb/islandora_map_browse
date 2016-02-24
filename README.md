@@ -7,6 +7,10 @@ A map browser leveraging the leaflet javascript library and MODS metadata to gen
 Modules
 * [Islandora Solr Search](http://github.com/islandora/islandora_solr_search)
 
+* [Colorbox](https://www.drupal.org/project/colorbox)
+
+
+
 Libraries
 * [Leaflet.js - v. 0.7.7](http://leafletjs.com/download.html)
    * create a directory called leaflet in sites/all/libraries
@@ -18,6 +22,8 @@ Libraries
 ## Configuration
 
 To enable Islandora Map Browse you will need to configure gsearch to index mods so a lat lon location fields is available.  If you are using the standard islandora VM, then you should have a Solr field that is <mods_subject_cartographics_coordinates_ms> and should contain the latitutde,longitude coordinate data.
+
+Before Browse Map will work you need to generate a static map file.  This is done to avoid having a new solr query run everytime someone browses the collection as this was found to be slow for large collections.
 
 ### Configuring Islandora Map Browse
 
@@ -45,3 +51,7 @@ After enabling the Islandora Map Browse module two new secondary display profile
 Selecting one of these secondary displays adds a folded map icon to the search results. Selecting the icon launches the map display.
 
 Once these are set up you should get a map.  If not check out the solr document that is returned as ensure that the field names are correct.
+
+### Configuration of Colorbox
+
+* Enable Colorbox load 
