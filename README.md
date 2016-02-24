@@ -9,7 +9,7 @@ Modules
 
 * [Colorbox](https://www.drupal.org/project/colorbox)
 
-* Libraries API](https://www.drupal.org/project/libraries)
+* [Libraries API](https://www.drupal.org/project/libraries)
 
 Libraries
 * [Leaflet.js - v. 0.7.7](http://leafletjs.com/download.html)
