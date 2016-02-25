@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Islandora solr search results wrapper template
+ * Islandora solr search results wrapper template.
  *
  * Variables available:
  * - $variables: all array elements of $variables can be used as a variable.
@@ -21,7 +21,7 @@
 <?php
 
   /*This is the display for the results page of the search NOT the map its self
-    What needs to happen here is the secondary profiles needs to be altered so that 
+    What needs to happen here is the secondary profiles needs to be altered so that
     the link is correct.  This is currently buried in the islandora_solr/includes/results.inc
     file on line 133
    */
