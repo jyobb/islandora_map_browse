@@ -13,11 +13,17 @@ Modules
 
 Libraries
 * [Leaflet.js - v. 0.7.7](http://leafletjs.com/download.html)
-   * create a directory called leaflet in sites/all/libraries
+   * Create a directory called leaflet in sites/all/libraries
    * cd to the leaflet directory, download the zip file and unzip it
 
 * [Leaflet Marker Cluster](https://github.com/Leaflet/Leaflet.markercluster/tree/leaflet-0.7)
-   * install in sites/all/libraries/Leaflet.markercluster
+   * Download the zip file.
+   * Install in sites/all/libraries/Leaflet.markercluster-leaflet-0.7
+
+## Solr Configuration
+
+This module has been tested with solr version 3.6.2 and fedora 3.5.
+
 
 ## Configuration
 
@@ -38,7 +44,7 @@ There are several configuration settings you should review and the module config
 * Default map centre - the center of the world as you know it.
 * Maximum items to render - for safety, returning extra items is not yet handled  
 
-![Configuration Options](https://raw.githubusercontent.com/jyobb/islandora_map_browse/master/islandora_map_browse_config.png "Configuration Options")
+![Configuration Options](https://github.com/jyobb/islandora_map_browse/master/islandora_map_browse_config.png "Configuration Options")
 
 
 ### Configuring Islandora Solr Search
