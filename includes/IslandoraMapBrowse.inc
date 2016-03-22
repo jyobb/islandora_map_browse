@@ -65,7 +65,9 @@ function view_all_results() {
 
 
 /**
- *
+ * This function is called from the above function.  
+ * It is responsible for parsing the json file and 
+ * creating the html.
  */
 function prepareStaticMapGEOJSONConfig ($response_data) {
 
@@ -119,7 +121,12 @@ function prepareStaticMapGEOJSONConfig ($response_data) {
 
         //$title = $doc['dc.title'][0];
 	$solrTitle = variable_get('map_browse_title_field');
-        $title = $doc[$solrTitle][0];
+
+	if(isset($doc[$solrTitle][0])){
+          $title = $doc[$solrTitle][0];
+        } else {
+          $title ="View Record";
+        }
         $baseURL = variable_get('map_browse_fedora_base');
         $contentString = '<h2><a target="_blank" href="' . $baseURL . '/' . $obj . '"/>' . $title . '</a></h2><img src="' . $baseURL . '/' . $thumb . '">' . $confFields;
 
@@ -211,6 +218,7 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
 
   /**
    * Fuction called by the secondary display profile to create map
+   * of all map points
    * Uses prepareGEOJSONVariablesConfig
    * Uses prepareSolrResultsGEOJSONConfig.
    */
@@ -367,7 +375,15 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
 
           //$title = $doc['dc.title'][0];
         $solrTitle = variable_get('map_browse_title_field');
-        $title = $doc[$solrTitle][0];
+        
+        //$title = $doc[$solrTitle][0];
+        //Make sure title exists.
+        if(isset($doc[$solrTitle][0])){
+          $title = $doc[$solrTitle][0];
+        } else {
+          $title ="View Record";
+        }
+
           $baseURL = variable_get('map_browse_fedora_base');
           $contentString = '<h2><a target="_blank" href="' . $baseURL . '/' . $obj . '"/>' . $title . '</a></h2><img src="' . $baseURL . '/' . $thumb . '">' . $confFields;
           if (array_key_exists("$lat" . "$lon", $leafletData)) {
