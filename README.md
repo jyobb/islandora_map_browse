@@ -20,6 +20,10 @@ Libraries
    * Download the zip file.
    * Install in sites/all/libraries/Leaflet.markercluster-leaflet-0.7
 
+## Leaflet Configuration
+Leaflet uses map quest maps that now require a key.  A free key that allows 15,000 hits a month can be downloaded by signing up here: https://developer.mapquest.com/plans There is a field in the configuration to add this key.
+
+
 ## Solr Configuration
 
 This module has been tested with solr version 3.6.2 and fedora 3.5.
