@@ -37,6 +37,9 @@ function view_all_results() {
     // Send javascript to page.
     drupal_add_js(array('islandora_map_browse_settings_jsInfo' => $jsInfo), 'setting');
     drupal_add_js(drupal_get_path('module', 'islandora_map_browse') . '/js/open_map_GEOJSON_location_config.js', 'file');
+$key = variable_get('mapquest_key');
+drupal_add_js('https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key='. $key, 'external');
+
 
     // Add leaflet libraries.
     $leaflet_path = libraries_get_path('leaflet');
@@ -73,8 +76,6 @@ function prepareStaticMapGEOJSONConfig ($response_data) {
 
   $uniqueItems = 0;
   $mods_location = variable_get('map_browse_coord_field');
-  $mods_location_lat = variable_get('map_browse_coord_lat_field');
-  $mods_location_lon = variable_get('map_browse_coord_lon_field');
   $map_centre = explode(",", variable_get('map_browse_map_centre'));
   $centre_lat = trim($map_centre[0]);
   $centre_lon = trim($map_centre[1]);
@@ -93,68 +94,53 @@ function prepareStaticMapGEOJSONConfig ($response_data) {
     $doc = $object_result['solr_doc'];
     $thumb = $object_result['thumbnail_url'];
     $obj = $object_result['object_url'];
-    $location = FALSE;
-    $lat = 0;
-    $lon = 0;
     // Need to put a check in here to avoid the undefined index error.
-    if ($mods_location != '') {
-      if (isset($doc[$mods_location]) && $doc[$mods_location] != '') {
-        $parts = explode(",", $doc[$mods_location][0]);
-        // Check to see if the location is in the correct format.  If not report to error log.
-        if (!isset($parts[1]) || !isset($parts[1])) {
-          watchdog("mods_location bad format", "See: " . $doc['PID']);
-        }
-        else {
-          $lat = floatval($parts[0]);
-          $lon = floatval($parts[1]);
-          $location = TRUE;
-        }
-      }
-    }
-    else {
-      if (isset($doc[$mods_location_lat]) && $doc[$mods_location_lat] != '') {
-        $lat = floatval($doc[$mods_location_lat][0]);
-        $lon = floatval($doc[$mods_location_lon][0]);
-        $location = TRUE;
-      }
-    }
-    
-    if ($location == TRUE) {
-      /* Check to see if the record 'doc' has any of the fields configured for display
-       * Add those that exist and ignore others
-       */
-      $confFields = '';
-      $uniqueItems = $uniqueItems + 1;
-      foreach ($displayFields as $k => $v) {
-      //Check the document to make sure the display item exists
-        if (array_key_exists($k, $doc) && $doc[$k][0] != '') {
-          if (strcmp($confFields, '') == 0) {
-            $confFields = '<p>' . $v . ': ' . $doc[$k][0] . '</p>';
-          }
-          else {
-            $confFields = '<p>' . $v . ': ' . $doc[$k][0] . '</p>' . $confFields;
-          }
-        }
-      }
-
-      //$title = $doc['dc.title'][0];
-      $solrTitle = variable_get('map_browse_title_field');
-
-      if(isset($doc[$solrTitle][0])){
-        $title = $doc[$solrTitle][0];
-      } else {
-        $title ="View Record";
-      }
-      $baseURL = variable_get('map_browse_fedora_base');
-      $contentString = '<h2><a target="_blank" href="' . $baseURL . '/' . $obj . '"/>' . $title . '</a></h2><img src="' . $baseURL . '/' . $thumb . '">' . $confFields;
-
-      if (array_key_exists("$lat" . "$lon", $leafletData)) {
-        $leafletData["$lat" . "$lon"]["content"] = $leafletData["$lat" . "$lon"]["content"] . $contentString;
+    if (isset($doc[$mods_location]) && $doc[$mods_location] != '') {
+      $parts = explode(",", $doc[$mods_location][0]);
+      // Check to see if the location is in the correct format.  If not report to error log.
+      if (!isset($parts[1]) || !isset($parts[1])) {
+        watchdog("mods_location bad format", "See: " . $doc['PID']);
       }
       else {
-        $leafletData["$lat" . "$lon"] = array("lat" => $lat, "lon" => $lon, "content" => $contentString);
+        $lat = floatval($parts[0]);
+        $lon = floatval($parts[1]);
+
+        /* Check to see if the record 'doc' has any of the fields configured for display
+         * Add those that exist and ignore others
+         */
+        $confFields = '';
+        $uniqueItems = $uniqueItems + 1;
+        foreach ($displayFields as $k => $v) {
+	//Check the document to make sure the display item exists
+          if (array_key_exists($k, $doc) && $doc[$k][0] != '') {
+            if (strcmp($confFields, '') == 0) {
+              $confFields = '<p>' . $v . ': ' . $doc[$k][0] . '</p>';
+            }
+            else {
+              $confFields = '<p>' . $v . ': ' . $doc[$k][0] . '</p>' . $confFields;
+            }
+          }
+        }
+
+        //$title = $doc['dc.title'][0];
+	$solrTitle = variable_get('map_browse_title_field');
+
+	if(isset($doc[$solrTitle][0])){
+          $title = $doc[$solrTitle][0];
+        } else {
+          $title ="View Record";
+        }
+        $baseURL = variable_get('map_browse_fedora_base');
+        $contentString = '<h2><a target="_blank" href="' . $baseURL . '/' . $obj . '"/>' . $title . '</a></h2><img src="' . $baseURL . '/' . $thumb . '">' . $confFields;
+
+        if (array_key_exists("$lat" . "$lon", $leafletData)) {
+          $leafletData["$lat" . "$lon"]["content"] = $leafletData["$lat" . "$lon"]["content"] . $contentString;
+        }
+        else {
+          $leafletData["$lat" . "$lon"] = array("lat" => $lat, "lon" => $lon, "content" => $contentString);
+        }
       }
-    }  
+    }
   }
 
   $pinInfo['uniqueItems'] = $uniqueItems;
@@ -165,6 +151,9 @@ function prepareStaticMapGEOJSONConfig ($response_data) {
   drupal_add_js(array('islandora_map_browse_settings_centreLat' => $centre_lat), 'setting');
   drupal_add_js(array('islandora_map_browse_settings_centreLon' => $centre_lon), 'setting');
   drupal_add_js(array('islandora_map_browse_settings_pininfo' => $jsPinInfo), 'setting');
+$key = variable_get('mapquest_key');
+drupal_add_js('https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key='. $key, 'external');
+
 
   drupal_add_js(array('islandora_map_browse_settings_leafletpins' => $leafletData), 'setting');
 
@@ -219,7 +208,7 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
     $response_data = $solrQueryProcessor->islandoraSolrResult['response'];
 
     // The fields added here are required.
-    $fl_params = "PID, RELS_EXT_hasModel_uri_ms, " . $configFields . variable_get('map_browse_title_field') . ", " . variable_get('map_browse_coord_field') . ", " . variable_get('map_browse_coord_lat_field') . ", " . variable_get('map_browse_coord_lon_field');
+    $fl_params = "PID, RELS_EXT_hasModel_uri_ms, " . $configFields . variable_get('map_browse_title_field') . ", " . variable_get('map_browse_coord_field');
 
     $solrQueryProcessor->solrParams['fl'] = array($fl_params);
 
@@ -265,7 +254,7 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
     }
 
     // The fields added here are required.
-    $fl_params = "PID, RELS_EXT_hasModel_uri_ms, " . $configFields . variable_get('map_browse_title_field') . ", " . variable_get('map_browse_coord_field') . ", " . variable_get('map_browse_coord_lat_field') . ", " . variable_get('map_browse_coord_lon_field');
+    $fl_params = "PID, RELS_EXT_hasModel_uri_ms, " . $configFields . variable_get('map_browse_title_field') . ", " . variable_get('map_browse_coord_field');
     $solrQueryProcessor->solrParams['fl'] = array($fl_params);
 
     // This section resets the limits on the query and re-executes.
@@ -314,6 +303,9 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
     if ($leaflet_path != FALSE) {
       drupal_add_js($leaflet_path . '/leaflet.js', 'file');
       drupal_add_css($leaflet_path . '/leaflet.css', 'module', 'all', 'false');
+$key = variable_get('mapquest_key');
+drupal_add_js('https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key='. $key, 'external');
+
     }
     else {
       watchdog("islandora_map_view", "Leaflet Library not found");
@@ -346,8 +338,6 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
 
     $uniqueItems = 0;
     $mods_location = variable_get('map_browse_coord_field');
-    $mods_location_lat = variable_get('map_browse_coord_lat_field');
-    $mods_location_lon = variable_get('map_browse_coord_lon_field');
     $map_centre = explode(",", variable_get('map_browse_map_centre'));
     $centre_lat = trim($map_centre[0]);
     $centre_lon = trim($map_centre[1]);
@@ -365,50 +355,34 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
       $doc = $object_result['solr_doc'];
       $thumb = $object_result['thumbnail_url'];
       $obj = $object_result['object_url'];
-      $location = FALSE;
-      $lat = 0;
-      $lon = 0;
 
       // Need to put a check in here to avoid the undefined index error.
-      if ($mods_location != '') {
-        if (isset($doc[$mods_location]) && $doc[$mods_location] != '') {
-          $parts = explode(",", $doc[$mods_location][0]);
-          // Check to see if the location is in the correct format.  If not report to error log.
-          if (!isset($parts[1]) || !isset($parts[1])) {
-            watchdog("mods_location bad format", "See: " . $doc['PID']);
-          }
-          else {
-            $lat = floatval($parts[0]);
-            $lon = floatval($parts[1]);
-            $location = TRUE;
-          }
+      if (isset($doc[$mods_location]) && $doc[$mods_location] != '') {
+        $parts = explode(",", $doc[$mods_location][0]);
+        // Check to see if the location is in the correct format.  If not report to error log.
+        if (!isset($parts[1]) || !isset($parts[1])) {
+          // watchdog("mods_location bad format", "See: " .$doc['PID']);.
         }
-      }
-      else {
-        if (isset($doc[$mods_location_lat]) && $doc[$mods_location_lat] != '') {
-          $lat = floatval($doc[$mods_location_lat][0]);
-          $lon = floatval($doc[$mods_location_lon][0]);
-          $location = TRUE;
-        }
-      }
+        else {
+          $lat = floatval($parts[0]);
+          $lon = floatval($parts[1]);
 
-      if ($location == TRUE) {
-        // Check to see if the record 'doc' has any of the fields configured for display
-        $confFields = '';
-        $uniqueItems = $uniqueItems + 1;
-        foreach ($displayFields as $k => $v) {
-          //$tv = trim($v);
-          if (array_key_exists($k, $doc) && $doc[$k][0] != '') {
-            if (strcmp($confFields, '') == 0) {
-              $confFields = '<p>' . $v . ': ' . $doc[$k][0] . '</p>';
-            }
-            else {
-              $confFields = '<p>' . $v . ': ' . $doc[$k][0] . '</p>' . $confFields;
+          // Check to see if the record 'doc' has any of the fields configured for display
+          $confFields = '';
+          $uniqueItems = $uniqueItems + 1;
+          foreach ($displayFields as $k => $v) {
+            //$tv = trim($v);
+            if (array_key_exists($k, $doc) && $doc[$k][0] != '') {
+              if (strcmp($confFields, '') == 0) {
+                $confFields = '<p>' . $v . ': ' . $doc[$k][0] . '</p>';
+              }
+              else {
+                $confFields = '<p>' . $v . ': ' . $doc[$k][0] . '</p>' . $confFields;
+              }
             }
           }
-        }
 
-        //$title = $doc['dc.title'][0];
+          //$title = $doc['dc.title'][0];
         $solrTitle = variable_get('map_browse_title_field');
         
         //$title = $doc[$solrTitle][0];
@@ -419,13 +393,14 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
           $title ="View Record";
         }
 
-        $baseURL = variable_get('map_browse_fedora_base');
-        $contentString = '<h2><a target="_blank" href="' . $baseURL . '/' . $obj . '"/>' . $title . '</a></h2><img src="' . $baseURL . '/' . $thumb . '">' . $confFields;
-        if (array_key_exists("$lat" . "$lon", $leafletData)) {
-          $leafletData["$lat" . "$lon"]["content"] = $leafletData["$lat" . "$lon"]["content"] . $contentString;
-        }
-        else {
-          $leafletData["$lat" . "$lon"] = array("lat" => $lat, "lon" => $lon, "content" => $contentString);
+          $baseURL = variable_get('map_browse_fedora_base');
+          $contentString = '<h2><a target="_blank" href="' . $baseURL . '/' . $obj . '"/>' . $title . '</a></h2><img src="' . $baseURL . '/' . $thumb . '">' . $confFields;
+          if (array_key_exists("$lat" . "$lon", $leafletData)) {
+            $leafletData["$lat" . "$lon"]["content"] = $leafletData["$lat" . "$lon"]["content"] . $contentString;
+          }
+          else {
+            $leafletData["$lat" . "$lon"] = array("lat" => $lat, "lon" => $lon, "content" => $contentString);
+          }
         }
       }
       else {
