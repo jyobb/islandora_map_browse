@@ -23,7 +23,10 @@ module_load_include('inc', 'islandora_solr_search', 'IslandoraSolrResults');
 function view_all_results() {
   $cwd = getcwd();
   $path = drupal_get_path('module', 'islandora_map_browse');
-  $dataPath = $cwd . "/" . $path . "/data/AllGEOLocated.json";
+
+  $siteName = variable_get('map_browse_fedora_base');
+    $siteHost = parse_url($siteName);
+  $dataPath = $cwd . "/" . $path . "/data/" . $siteHost['host'] . ".json";
   if (file_exists($dataPath) == 1) {
     $response_data = file_get_contents($dataPath);
     $response_data_d = json_decode($response_data, TRUE);
@@ -238,7 +241,9 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
 
     $cwd = getcwd();
     $path = drupal_get_path('module', 'islandora_map_browse');
-    $dataPath = $cwd . "/" . $path . "/data/AllGEOLocated.json";
+    $siteName = variable_get('map_browse_fedora_base'); 
+    $siteHost = parse_url($siteName);
+    $dataPath = $cwd . "/" . $path . "/data/" . $siteHost['host'] . ".json";
     $increment = 13000;
     $lowerlimit = ((($page + 1) * $increment) - $increment);
 
@@ -263,7 +268,7 @@ class IslandoraMapBrowse extends IslandoraSolrResults {
     $solrQueryProcessor->resetResults();
     $solrQueryProcessor->executeQuery(FALSE);
     $response_data = $solrQueryProcessor->islandoraSolrResult['response'];
-
+file_put_contents("/var/www/html/drupal/sites/all/modules/islandora_map_browse/data/err.txt", "some data" . $gen . $dataPath);
     if (strcmp($gen, 'yes') == 0) {
       file_put_contents($dataPath, json_encode($response_data));
     }
