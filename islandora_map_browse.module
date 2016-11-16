@@ -185,7 +185,7 @@ function islandora_map_browse_theme_registry_alter(&$theme_registry) {
   /*This theme change was to make the browse view look more like the solr search view*/
   // tell the theme system to look in the "templates" subdirectory within our module directory.
   $theme_registry['islandora_solr_wrapper']['theme paths'] = array(0 => drupal_get_path('module', 'islandora_map_browse') . '/theme');
-  $theme_registry['islandora_solr_wrapper']['theme path'] = drupal_get_path('module', 'islandra_map_browse') . '/theme';
+  $theme_registry['islandora_solr_wrapper']['theme path'] = drupal_get_path('module', 'islandora_map_browse') . '/theme';
   $theme_registry['islandora_solr_wrapper']['file'] = drupal_get_path('module', 'islandora_map_browse') . '/theme/map_display_theme.inc';
   $theme_registry['islandora_solr_wrapper']['path'] = drupal_get_path('module', 'islandora_map_browse') . '/theme';
   $theme_registry['islandora_solr_wrapper']['template'] = 'map-display';
