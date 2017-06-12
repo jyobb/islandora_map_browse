@@ -16,6 +16,8 @@ function initialize() {
   // var centre = Drupal.settings.islandora_map_browse_settings.centre;.
   var lat = Drupal.settings.islandora_map_browse_settings_centreLat;
   var lon = Drupal.settings.islandora_map_browse_settings_centreLon;
+  var zoom = Drupal.settings.islandora_map_browse_settings_zoom;
+
   var pininfo = Drupal.settings.islandora_map_browse_settings_pininfo;
   // Var geopins = Drupal.settings.islandora_map_browse_settings_geopins;.
   var leafPins = Drupal.settings.islandora_map_browse_settings_leafletpins;
@@ -57,7 +59,7 @@ function initialize() {
 	  layers:MQ.mapLayer(),
     center: [lat, lon],
         minZoom: 2,
-        zoom: 8
+        zoom: zoom
   });
 
   //L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {

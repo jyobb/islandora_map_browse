@@ -91,6 +91,16 @@ function map_browse_config($form, &$form_state) {
     '#required' => TRUE,
   );
 
+  $form['map_browse_map_zoom'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Default Map Zoom'),
+      '#default_value' => variable_get('map_browse_map_zoom', '8'),
+      '#size' => 3,
+      '#maxlength' => 3,
+      '#description' => t('Default Map Zoom'),
+      '#required' => TRUE,
+  );
+
   $form['mapquest_key'] = array(
     '#type' => 'textfield',
     '#title' => t('Map Quest Key'),

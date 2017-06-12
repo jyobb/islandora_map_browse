@@ -82,8 +82,10 @@ function prepareStaticMapGEOJSONConfig ($response_data) {
   $map_centre = explode(",", variable_get('map_browse_map_centre'));
   $centre_lat = trim($map_centre[0]);
   $centre_lon = trim($map_centre[1]);
+  $zoom = variable_get('map_browse_map_zoom');
 
-  $displayArr = explode("|", variable_get('map_browse_return_fields'));
+
+    $displayArr = explode("|", variable_get('map_browse_return_fields'));
   foreach($displayArr as $v){
     $nameField = explode(",", $v);
     $field = trim ($nameField[1]);
@@ -154,8 +156,10 @@ function prepareStaticMapGEOJSONConfig ($response_data) {
   drupal_add_js(array('islandora_map_browse_settings_centreLat' => $centre_lat), 'setting');
   drupal_add_js(array('islandora_map_browse_settings_centreLon' => $centre_lon), 'setting');
   drupal_add_js(array('islandora_map_browse_settings_pininfo' => $jsPinInfo), 'setting');
-$key = variable_get('mapquest_key');
-drupal_add_js('https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key='. $key, 'external');
+  drupal_add_js(array('islandora_map_browse_settings_zoom' => $zoom), 'setting');
+
+  $key = variable_get('mapquest_key');
+  drupal_add_js('https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key='. $key, 'external');
 
 
   drupal_add_js(array('islandora_map_browse_settings_leafletpins' => $leafletData), 'setting');
@@ -346,6 +350,7 @@ drupal_add_js('https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key='. $ke
     $map_centre = explode(",", variable_get('map_browse_map_centre'));
     $centre_lat = trim($map_centre[0]);
     $centre_lon = trim($map_centre[1]);
+    $zoom = variable_get('map_browse_map_zoom');
 
   $displayArr = explode("|", variable_get('map_browse_return_fields'));
   foreach($displayArr as $v){
@@ -426,6 +431,7 @@ drupal_add_js('https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key='. $ke
     drupal_add_js(array('islandora_map_browse_settings_centreLat' => $centre_lat), 'setting');
     drupal_add_js(array('islandora_map_browse_settings_centreLon' => $centre_lon), 'setting');
     drupal_add_js(array('islandora_map_browse_settings_pininfo' => $jsPinInfo), 'setting');
+    drupal_add_js(array('islandora_map_browse_settings_zoom' => $zoom), 'setting');
 
     drupal_add_js(array('islandora_map_browse_settings_leafletpins' => $leafletData), 'setting');
 
