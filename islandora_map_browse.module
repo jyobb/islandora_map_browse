@@ -49,7 +49,6 @@ function islandora_map_browse_preprocess_page(&$variables, $hook) {
   if (array_key_exists('solr_profile', $qparam)) {
     if (strcasecmp($qparam['solr_profile'], 'MapGEOJSONView') == 0 || strcasecmp($qparam['solr_profile'], 'MapGEOJSONViewAll') == 0) {
       $variables['theme_hook_suggestions'][] = 'islandora_map_browse';
-        //$variables['theme_hook_suggestions'][] = 'page__islandora_map_browse';
     }
   }
 }
@@ -60,7 +59,7 @@ function islandora_map_browse_preprocess_page(&$variables, $hook) {
  *   Remove some of the css so that the colorbox works correctly
  *   some themes have css that messes up the page so only include
  *   required styles
- */
+
 function islandora_map_browse_css_alter(&$css) {
   $qparam = drupal_get_query_parameters();
   if (array_key_exists('solr_profile', $qparam)) {
@@ -84,21 +83,13 @@ function islandora_map_browse_css_alter(&$css) {
     }
   }
 }
-
+*/
 function islandora_map_browse_page_alter(&$page){
     $qparam = drupal_get_query_parameters();
-    var_dump($qparam);
     if (array_key_exists('solr_profile', $qparam)) {
         unset($page["page_top"]["toolbar"]);
         unset($page["sidebar_first"]);
         unset($page["footer"]);
-        //echo "<pre>";
-            //foreach ($page as $k => $v){
-             //   echo "<br>" . $k . " and " . $v;
-            //}
-           // var_dump($page);
-           // var_dump($page);
-        //echo "</pre>";
     }
 }
 
