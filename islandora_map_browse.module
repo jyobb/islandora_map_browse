@@ -47,7 +47,7 @@ function islandora_map_browse_theme() {
 function islandora_map_browse_preprocess_page(&$variables, $hook) {
   $qparam = drupal_get_query_parameters();
   if (array_key_exists('solr_profile', $qparam)) {
-      //var_dump($variables);
+      var_dump($variables);
       //var_dump($qparam);
     if (strcasecmp($qparam['solr_profile'], 'MapGEOJSONView') == 0 || strcasecmp($qparam['solr_profile'], 'MapGEOJSONViewAll') == 0) {
       $variables['theme_hook_suggestions'][] = 'islandora_map_browse';
@@ -88,9 +88,9 @@ function islandora_map_browse_css_alter(&$css) {
 }
 
 function islandora_map_browse_page_alter(&$page){
-    echo "<pre>";
-    var_dump($page);
-    echo "</pre>";
+    //echo "<pre>";
+   // var_dump($page);
+    //echo "</pre>";
     //["page_top"]=> array(1) { ["toolbar
 
 }
