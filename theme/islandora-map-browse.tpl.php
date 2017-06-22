@@ -1,11 +1,4 @@
-<?php
-
-
-?>
-
-
-
-          <!-- <div class="clearfix"> -->
-            <?php print render($page['content']);?>
-<?php echo "say cheese2"; ?>
-          <!-- </div> -->
+/*
+  Template for islandora_map_browse
+*/
+<?php print render($page['content']);?>
