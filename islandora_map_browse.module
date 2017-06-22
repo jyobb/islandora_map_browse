@@ -47,6 +47,7 @@ function islandora_map_browse_theme() {
 function islandora_map_browse_preprocess_page(&$variables, $hook) {
   $qparam = drupal_get_query_parameters();
   if (array_key_exists('solr_profile', $qparam)) {
+      var_dump($variables);
       var_dump($qparam);
     if (strcasecmp($qparam['solr_profile'], 'MapGEOJSONView') == 0 || strcasecmp($qparam['solr_profile'], 'MapGEOJSONViewAll') == 0) {
       //$variables['theme_hook_suggestions'][] = 'islandora_map_browse';
