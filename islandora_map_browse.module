@@ -91,9 +91,13 @@ function islandora_map_browse_page_alter(&$page){
     if (array_key_exists('solr_profile', $qparam)) {
         unset($page["page_top"]["toolbar"]);
         unset($page["page_top"]["sidebar_first"]);
-        echo "<pre>";
-            var_dump($page);
-        echo "</pre>";
+        //echo "<pre>";
+            foreach ($page as $k => $v){
+                echo "<br>" . $k . " and " . $v;
+            }
+           // var_dump($page);
+           // var_dump($page);
+        //echo "</pre>";
     }
 }
 
