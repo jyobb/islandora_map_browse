@@ -89,9 +89,8 @@ function islandora_map_browse_page_alter(&$page){
     $qparam = drupal_get_query_parameters();
     var_dump($qparam);
     if (array_key_exists('solr_profile', $qparam)) {
-        echo "<pre>";
-        var_dump($variables);
-        echo "</pre>";
+        unset($page["page_top"]["toolbar"]);
+        
     }
 }
 
