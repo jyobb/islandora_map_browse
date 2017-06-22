@@ -88,8 +88,10 @@ function islandora_map_browse_css_alter(&$css) {
 }
 
 function islandora_map_browse_page_alter(&$page){
-
-    var_dump($page);
+    echo "<pre>";
+    var_export($page, true);
+    echo "</pre>";
+    //["page_top"]=> array(1) { ["toolbar
 
 }
 
