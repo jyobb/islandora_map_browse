@@ -90,11 +90,12 @@ function islandora_map_browse_page_alter(&$page){
     var_dump($qparam);
     if (array_key_exists('solr_profile', $qparam)) {
         unset($page["page_top"]["toolbar"]);
-        unset($page["page_top"]["sidebar_first"]);
+        unset($page["sidebar_first"]);
+        unset($page["footer"]);
         //echo "<pre>";
-            foreach ($page as $k => $v){
-                echo "<br>" . $k . " and " . $v;
-            }
+            //foreach ($page as $k => $v){
+             //   echo "<br>" . $k . " and " . $v;
+            //}
            // var_dump($page);
            // var_dump($page);
         //echo "</pre>";
