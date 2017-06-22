@@ -31,7 +31,7 @@ function islandora_map_browse_theme() {
     'islandora_map_browse' => array(
       'path' => $path . '/theme',
       'variables' => array(),
-      'template' => 'islandora-map-browse',
+      'template' => 'page--islandora-map-browse',
     ),
   );
 }
