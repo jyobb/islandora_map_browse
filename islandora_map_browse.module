@@ -90,7 +90,9 @@ function islandora_map_browse_page_alter(&$page){
     var_dump($qparam);
     if (array_key_exists('solr_profile', $qparam)) {
         unset($page["page_top"]["toolbar"]);
-        
+        echo "<pre>";
+            var_dump($page);
+        echo "</pre>";
     }
 }
 
