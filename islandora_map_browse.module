@@ -53,37 +53,6 @@ function islandora_map_browse_preprocess_page(&$variables, $hook) {
   }
 }
 
-/**
- * @param css array included in the page
- *
- *   Remove some of the css so that the colorbox works correctly
- *   some themes have css that messes up the page so only include
- *   required styles
-
-function islandora_map_browse_css_alter(&$css) {
-  $qparam = drupal_get_query_parameters();
-  if (array_key_exists('solr_profile', $qparam)) {
-    if (strcasecmp($qparam['solr_profile'], 'MapGEOJSONView') == 0 || strcasecmp($qparam['solr_profile'], 'MapGEOJSONViewAll') == 0) {
-
-      // These included, they are needed for the map.
-      $css_to_include = array(
-        'sites/all/modules/colorbox/styles/default/colorbox_style.css' => TRUE,
-        'sites/all/modules/islandora_map_browse/css/popup.css' => TRUE,
-        'sites/all/modules/islandora_map_browse/css/islandora_map_browse.css' => TRUE,
-        'misc/ui/jquery.ui.core.css' => TRUE,
-        'misc/ui/jquery.ui.theme.css' => TRUE,
-        'sites/all/libraries/leaflet/leaflet.css' => TRUE,
-        'sites/all/libraries/Leaflet.markercluster-leaflet-0.7/dist/MarkerCluster.css' => TRUE,
-        'sites/all/libraries/Leaflet.markercluster-leaflet-0.7/dist/MarkerCluster.Default.css' => TRUE,
-        'modules/shortcut/shortcut.css' => TRUE,
-        'modules/toolbar/toolbar.css' => TRUE,
-      );
-
-      $css = array_intersect_key($css, $css_to_include);
-    }
-  }
-}
-*/
 function islandora_map_browse_page_alter(&$page){
     $qparam = drupal_get_query_parameters();
     if (array_key_exists('solr_profile', $qparam)) {
