@@ -10,21 +10,22 @@ body {
 #skip-link {
   display: none;
 }
-
-//cboxWrapper {
-  // background: #000;
-  //
-//}
+/*
+cboxWrapper {
+   background: #000;
+}
+*/
 
 #info_canvas {
   //background: #eeeeee;
 }
 
-//.region-content {
+/*.region-content {
   //background: #000;
   //
-//}
+}
+*/
 
 #toolbar {
-  display: none;
+  //display: none;
 }
